@@ -21,11 +21,12 @@
     }
   },
   "scripts": {
-    "watch": "nodemon -e ts -w ./src --exec 'ts-node --project tsconfig-ssr.json -r tsconfig-paths/register src/index.ts'",
+    "watch": "nodemon -e ts -w ./src --exec 'ts-node --project tsconfig-ssr.json -r tsconfig-paths/register src/server.ts'",
     "watch:test": "nodemon --watch 'src/*.ts' --ignore 'src/**/*.spec.ts' --exec 'echo 11'",
-    "start": "ts-node --project tsconfig-ssr.json -r tsconfig-paths/register src/index.ts",
+    "start": "ts-node --project tsconfig-ssr.json -r tsconfig-paths/register src/server.ts",
     "build": "rm -rf build && parcel build src/index.ts --out-dir build --no-source-maps",
-    "build:parcel": "parcel build src/index.html",
+    "build:parcel": "parcel build src/index.html --out-dir ./public",
+    "watch:parcel": "parcel watch src/index.html --out-dir ./public",
     "start:parcel": "parcel --port 3000 src/index.html",
     "dev": "ts-node-dev --respawn  --project tsconfig-ssr.json -r tsconfig-paths/register src/index.ts",
     "build:prod": "cross-env NODE_ENV=production parcel build src/index.html --public-url .",
@@ -33,7 +34,8 @@
   },
   "alias": {
     "simple-boot-front": "../../simple-boot-front/src",
-    "simple-boot-http-ssr": "../../src"
+    "simple-boot-http-ssr": "../../src",
+    "@fetch": "../../src/fetch/front"
   },
   "devDependencies": {
     "@types/jest": "^26.0.22",

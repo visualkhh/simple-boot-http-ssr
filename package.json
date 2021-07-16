@@ -78,6 +78,7 @@
     "typescript": "^4.2.3"
   },
   "dependencies": {
+    "jsdom": "^16.6.0",
     "simple-boot-front": "^1.0.49"
   }
 }

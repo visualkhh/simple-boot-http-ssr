@@ -27,6 +27,7 @@
     /* Disallow inconsistently-cased references to the same file. */
     "lib": [
       "es5",
+      "dom",
       "es2015",
       "scripthost",
       "es2015.proxy",

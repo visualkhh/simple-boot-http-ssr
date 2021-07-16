@@ -2,8 +2,9 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "paths": {
+      "simple-boot-front/*": ["../../simple-boot-front/src/*"],
       "simple-boot-http-ssr/*": ["../../src/*"],
-      "@fetch": ["../../src/fetch/SsrFetch"],
+      "@fetch": ["../../src/fetch/server"]
     }
   }
 }
