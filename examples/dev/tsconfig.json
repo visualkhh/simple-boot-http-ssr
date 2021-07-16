@@ -48,6 +48,7 @@
     "paths": {
 //      "*.html": "node_modules/simple-boot-front/types/index.d.ts"
 //      "@src/*": ["src/*"],
+      "dom-render/*": ["../../dom-render/src/*"],
       "simple-boot-front/*": ["../../simple-boot-front/src/*"],
       "simple-boot-http-ssr/*": ["../../src/*"],
       "@fetch": ["../../src/fetch/front"]

@@ -7,6 +7,7 @@ export type Listen = { port?: number, hostname?: string, backlog?: number, liste
 export class HttpServerOption extends SimOption {
     public serverOption?: ServerOptions;
     public listen: Listen = {port: 8081};
+    public publicPath = '/public'
 
     constructor(advice: ConstructorType<any>[] = []) {
         super(advice);

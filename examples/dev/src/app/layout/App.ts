@@ -1,10 +1,14 @@
 import {FrontModule} from 'simple-boot-front/module/FrontModule';
 import {Sim} from 'simple-boot-core/decorators/SimDecorator';
-import {fetch} from '@fetch';
+import {ssrFetch} from '@fetch';
+
 @Sim({scheme: 'layout'})
 export class App extends FrontModule {
     constructor() {
-        super({template: fetch.file('app.html'), styleImports: [fetch.file('app.css')]});
+        super({
+            template: ssrFetch.text('app.html', __dirname),
+            styleImports: [ssrFetch.text('app.css', __dirname)]
+        });
     }
 
     onInit() {

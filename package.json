@@ -30,6 +30,7 @@
   "workspaces": [
     "./",
     "simple-boot-front",
+    "dom-render",
     "examples/dev",
     "templates/http"
   ],
@@ -54,6 +55,7 @@
     "build": "rm -rf dist && tsc --outDir dist --declarationDir dist",
     "npm-build": "rm -rf dist && tsc --outDir dist --declarationDir dist && cp package.json dist && cp README.MD dist",
     "npm-publish": "npm run npm-build && npm publish ./dist",
+    "start:dev": "npm run start --workspace=dev",
     "dev": "npm run dev --workspace=dev",
     "tsc": "tsc",
     "test": "jest --detectOpenHandles --forceExit"
