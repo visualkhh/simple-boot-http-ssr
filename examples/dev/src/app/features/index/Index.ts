@@ -5,6 +5,6 @@ import {ssrFetch} from '@fetch';
 @Sim()
 export class Index extends FrontModule {
     constructor() {
-        super({template: ssrFetch.text('./index.html', __dirname)});
+        super({name: __dirname, template: ssrFetch.text('./index.html', Index)});
     }
 }

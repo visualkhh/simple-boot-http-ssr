@@ -1,4 +1,5 @@
 import {Fetch} from '../Fetch';
+import {ConstructorType} from 'simple-boot-core/types/Types';
 
 class Index extends Fetch {
     constructor() {
@@ -6,12 +7,13 @@ class Index extends Fetch {
         console.log('--SsrFrontFetch')
     }
 
-    text(path: string, dirname?: string): Promise<string | void> {
-        const headers = {
-            accept: 'application/vnd.simple-boot-http-ssr'
-        };
-        const option = {method: 'GET', headers: headers};
-        return fetch(location.pathname, option).then((response) => {
+    text(path: string, trigger: ConstructorType<any>, dirname?: string): Promise<string | void> {
+        // const headers = {
+        //     accept: 'application/vnd.simple-boot-http-ssr'
+        // };
+        const url = location.pathname + '?' + new URLSearchParams({trigger: trigger.name, path, simpleboothttpssr: 'true'});
+        const option = {method: 'GET'};
+        return fetch(url, option).then((response) => {
             // The API call was successful!
             return response.text();
         }).catch(function (err) {
