@@ -29,6 +29,7 @@
   },
   "workspaces": [
     "./",
+    "simple-boot-front",
     "examples/dev",
     "templates/http"
   ],
@@ -80,4 +81,3 @@
     "simple-boot-front": "^1.0.49"
   }
 }
-

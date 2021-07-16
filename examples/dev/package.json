@@ -32,6 +32,7 @@
     "test": "jest --detectOpenHandles --forceExit"
   },
   "alias": {
+    "simple-boot-front": "../../simple-boot-front/src",
     "simple-boot-http-ssr": "../../src"
   },
   "devDependencies": {

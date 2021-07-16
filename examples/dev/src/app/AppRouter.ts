@@ -6,6 +6,7 @@ import {Index} from './features/index';
 @Sim()
 export class AppRouter extends FrontRouter {
     '' = Index
+    '/' = Index
 
     constructor() {
         super('', App);
