@@ -73,7 +73,9 @@ export class SimpleBootHttpSsr extends SimpleApplication {
                 })
             } else {
                 // console.log('file-->', this.option.publicPath, req.url)
-                fs.readFile(path.join(this.option.publicPath, (req.url === '/' ? '/index.html' : req.url) ?? ''), (err, data) => {
+                // fs.readFile(path.join(this.option.publicPath, (req.url === '/' ? '/index.html' : req.url) ?? ''), (err, data) => {
+
+                fs.readFile(path.join(this.option.publicPath, !req.url?.endsWith('js') ? '/index.html' : req.url ?? ''), (err, data) => {
                     if (err) {
                         res.writeHead(404);
                         res.end(JSON.stringify(err));
