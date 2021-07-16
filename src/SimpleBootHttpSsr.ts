@@ -7,7 +7,7 @@ import {Router} from 'simple-boot-core/route/Router';
 import {URL} from 'url';
 import {IncomingMessage, Server, ServerResponse} from 'http'
 
-export class SimpleBootHttpServer extends SimpleApplication {
+export class SimpleBootHttpSsr extends SimpleApplication {
     constructor(public rootRouter: ConstructorType<Router>, public option: HttpServerOption = new HttpServerOption()) {
         super(rootRouter, option);
     }
