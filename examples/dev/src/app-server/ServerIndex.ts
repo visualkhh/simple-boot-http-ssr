@@ -4,7 +4,6 @@ import {IncomingMessage, ServerResponse} from 'http';
 
 @Sim({})
 export class ServerIndex extends HttpModule {
-
     receive(req: IncomingMessage, res: ServerResponse) {
         req.on('data', chunk => {
             console.log('-->', chunk.toString());
