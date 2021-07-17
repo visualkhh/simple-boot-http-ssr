@@ -5,6 +5,11 @@
       "simple-boot-front/*": ["../../simple-boot-front/src/*"],
       "simple-boot-http-ssr/*": ["../../src/*"],
       "@fetch": ["../../src/fetch/server"]
-    }
+    },
+    "target": "es5",
+    "lib": [
+      "ES2016",
+      "DOM"
+    ]
   }
 }
