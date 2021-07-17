@@ -9,8 +9,9 @@ import fs from 'fs';
 import path from 'path';
 import {FrontModule} from 'simple-boot-front/module/FrontModule';
 import {SimFrontOption} from 'simple-boot-front/option/SimFrontOption';
-import {HttpModule} from "./module/HttpModule";
-// const a = require('')
+import {HttpModule} from './module/HttpModule';
+
+console.log('-----------')
 export class SimpleBootHttpSsr extends SimpleApplication {
     constructor(public rootRouter: ConstructorType<FrontRouter>, public frontOption: SimFrontOption, public option: HttpServerOption = new HttpServerOption()) {
         super(rootRouter, option);

@@ -2,7 +2,6 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "paths": {
-      "dom-render/*": ["../../dom-render/src/*"],
       "simple-boot-front/*": ["../../simple-boot-front/src/*"],
       "simple-boot-http-ssr/*": ["../../src/*"],
       "@fetch": ["../../src/fetch/server"]

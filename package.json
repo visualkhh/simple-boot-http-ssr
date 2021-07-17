@@ -29,8 +29,9 @@
   },
   "workspaces": [
     "./",
+    "simple-boot-front",
     "examples/dev",
-    "templates/http"
+    "templates/node-http"
   ],
   "jest": {
     "transform": {

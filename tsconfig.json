@@ -14,7 +14,6 @@
     "moduleResolution": "node",            /* Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */
     "baseUrl": "src",                       /* Base directory to resolve non-absolute module names. */
     "paths": {
-      "dom-render/*": ["dom-render/src/*"],
       "simple-boot-front/*": ["./simple-boot-front/src/*"],
     },
     "typeRoots": ["@type", "node_modules/@types", "node_modules/handlebars", "node_modules/reflect-metadata", "node_modules/rxjs","@types"],                       /* List of folders to include type definitions from. */
@@ -31,7 +30,6 @@
     /* Disallow inconsistently-cased references to the same file. */
     "lib": [
       "es5",
-      "dom",
       "es2015",
       "scripthost",
       "es2015.proxy",

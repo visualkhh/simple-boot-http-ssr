@@ -35,7 +35,7 @@
     "test": "jest --detectOpenHandles --forceExit"
   },
   "alias": {
-
+    "simple-boot-front": "../../simple-boot-front/src",
     "simple-boot-http-ssr": "../../src",
     "@fetch": "../../src/fetch/front"
   },
@@ -57,6 +57,6 @@
     "typescript": "^4.2.3"
   },
   "dependencies": {
-    "simple-boot-http-ssr": "1.0.0"
+    "simple-boot-http-ssr": "1.0.1"
   }
 }

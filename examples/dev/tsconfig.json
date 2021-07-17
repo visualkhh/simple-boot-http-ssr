@@ -48,7 +48,7 @@
     "paths": {
 //      "*.html": "node_modules/simple-boot-front/types/index.d.ts"
 //      "@src/*": ["src/*"],
-
+      "simple-boot-front/*": ["../../simple-boot-front/src/*"],
       "simple-boot-http-ssr/*": ["../../src/*"],
       "@fetch": ["../../src/fetch/front"]
     },                          /* A series of entries which re-map imports to lookup locations relative to the 'baseUrl'. */
@@ -81,9 +81,10 @@
     /* Disallow inconsistently-cased references to the same file. */
     "lib": [
       "es5",
-      "dom",
+      "es2015",
       "scripthost",
-      "es2015.proxy"
+      "es2015.proxy",
+      "es2015.collection"
     ]
   }
 }
