@@ -10,7 +10,9 @@ export class ServerIndex extends HttpModule {
             console.log('-->', chunk.toString());
         });
         req.on('end', () => {
-            res.end('ok');
+            res.setHeader('Content-Type', 'application/json');
+            res.write(JSON.stringify({status: 'ok'}));
+            res.end();
         });
     }
 }

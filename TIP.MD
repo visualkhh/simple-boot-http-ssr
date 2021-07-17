@@ -9,4 +9,5 @@ tip
 
 - node
   - http
-    - get body: https://itnext.io/how-to-handle-the-post-request-body-in-node-js-without-using-a-framework-cd2038b93190
+    - request: https://itnext.io/how-to-handle-the-post-request-body-in-node-js-without-using-a-framework-cd2038b93190
+    - response: https://nodejs.org/ko/docs/guides/anatomy-of-an-http-transaction/
