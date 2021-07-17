@@ -35,8 +35,7 @@
     "test": "jest --detectOpenHandles --forceExit"
   },
   "alias": {
-    "dom-render": "../../dom-render/src",
-    "simple-boot-front": "../../simple-boot-front/src",
+
     "simple-boot-http-ssr": "../../src",
     "@fetch": "../../src/fetch/front"
   },
@@ -50,8 +49,10 @@
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.3.1",
+    "jest": "^26.6.3",
     "ts-node": "^10.0.0",
     "nodemon": "^2.0.12",
+    "parcel-bundler": "^1.12.5",
     "tsconfig-paths": "^3.9.0",
     "typescript": "^4.2.3"
   },

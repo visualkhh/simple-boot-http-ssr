@@ -271,3 +271,5 @@ gradle-app.setting
 /examples/dev/public/
 /examples/dev/build/
 /dom-render/
+/simple-boot-front/
+/dom-render/

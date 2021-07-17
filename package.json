@@ -1,6 +1,6 @@
 {
   "name": "simple-boot-http-ssr",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "SimpleBootHttpSsr.js",
   "license": "MIT",
   "description": "back end http server frameworks",
@@ -79,6 +79,6 @@
   },
   "dependencies": {
     "jsdom": "^16.6.0",
-    "simple-boot-front": "^1.0.51"
+    "simple-boot-front": "^1.0.53"
   }
 }

@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      "@fetch": ["./node_modules/simple-boot-http-ssr/fetch/server"]
+    }
+  }
+}
