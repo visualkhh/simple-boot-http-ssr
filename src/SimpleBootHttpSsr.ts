@@ -4,7 +4,7 @@ import {ConstructorType} from 'simple-boot-core/types/Types';
 import {Intent} from 'simple-boot-core/intent/Intent';
 import {URL} from 'url';
 import {IncomingMessage, Server, ServerResponse} from 'http'
-import {FrontRouter} from '../simple-boot-front/src/router/FrontRouter';
+import {FrontRouter} from 'simple-boot-front/router/FrontRouter';
 import fs from 'fs';
 import path from 'path';
 import {FrontModule} from 'simple-boot-front/module/FrontModule';

@@ -40,6 +40,8 @@
   },
   "exclude": [
     "examples",
+    "simple-boot-front",
+    "dom-render",
     "rollup.config.js",
     "test",
     "cli",

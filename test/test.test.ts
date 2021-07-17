@@ -4,6 +4,4 @@ describe('test', () => {
         expect(i).toBe(2)
         done()
     })
-
 })
-
