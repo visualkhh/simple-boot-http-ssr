@@ -15,7 +15,7 @@
     "baseUrl": "src",                       /* Base directory to resolve non-absolute module names. */
     "paths": {
       "dom-render/*": ["dom-render/src/*"],
-      "simple-boot-front/*": ["simple-boot-front/src/*"],
+      "simple-boot-front/*": ["./simple-boot-front/src/*"],
     },
     "typeRoots": ["@type", "node_modules/@types", "node_modules/handlebars", "node_modules/reflect-metadata", "node_modules/rxjs","@types"],                       /* List of folders to include type definitions from. */
     "types": ["node", "reflect-metadata", "rxjs", "jest"],                     /* Type declaration files to be included in compilation. */

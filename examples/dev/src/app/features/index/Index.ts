@@ -5,6 +5,11 @@ import {ssrFetch} from '@fetch';
 @Sim()
 export class Index extends FrontModule {
     constructor() {
-        super({name: __dirname, template: ssrFetch.text('./index.html', Index)});
+        super({name: __dirname, template: 'fetch://./index.html', styleImports: ['h1{color:red}'], fetcher: ssrFetch});
+    }
+
+    public goServer() {
+        console.log('goServer')
+        ssrFetch.json('/server', {name: 'visualkhh 빵꾸똥꾸'})
     }
 }

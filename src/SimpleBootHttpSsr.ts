@@ -9,6 +9,7 @@ import fs from 'fs';
 import path from 'path';
 import {FrontModule} from 'simple-boot-front/module/FrontModule';
 import {SimFrontOption} from 'simple-boot-front/option/SimFrontOption';
+import {HttpModule} from "./module/HttpModule";
 // const a = require('')
 export class SimpleBootHttpSsr extends SimpleApplication {
     constructor(public rootRouter: ConstructorType<FrontRouter>, public frontOption: SimFrontOption, public option: HttpServerOption = new HttpServerOption()) {
@@ -21,18 +22,20 @@ export class SimpleBootHttpSsr extends SimpleApplication {
         const server = this.option.serverOption ? new Server(this.option.serverOption) : new Server();
         server.on('request', (req: IncomingMessage, res: ServerResponse) => {
             const url = new URL(req.url!, 'http://' + req.headers.host);
+            const simpleboothttpssr = url.searchParams.get('simpleboothttpssr');
+            const targetPath = url.searchParams.get('path');
+            const isRouter = url.searchParams.get('router');
+
             console.log('--22>', req.headers.accept)
-            if (url.searchParams.get('simpleboothttpssr') === 'true') {
+            if (simpleboothttpssr === 'true') {
                 const intent = new Intent(req.url ?? '', url);
                 this.routing(intent).then(it => {
-                    const trigger = decodeURIComponent(intent.queryParams?.trigger);
-                    const targetPath = decodeURIComponent(intent.queryParams?.path);
                     let triggerModule: FrontModule | undefined;
-                    if (it.module?.name === trigger) {
-                        triggerModule = it.getModuleInstance<FrontModule>() as FrontModule;
-                    } else if (it.router?.module?.name === trigger) {
+                    if (isRouter === 'true') {
                         const s = this.simstanceManager;
-                        triggerModule = s.getOrNewSim(it.router.module) as FrontModule;
+                        triggerModule = s.getOrNewSim(it.router?.module) as FrontModule;
+                    } else {
+                        triggerModule = it.getModuleInstance();
                     }
 
                     if (triggerModule instanceof FrontModule && triggerModule._inputOption.name && targetPath) {
@@ -50,6 +53,8 @@ export class SimpleBootHttpSsr extends SimpleApplication {
                         //     res.writeHead(200);
                         //     res.end(sit);
                         // })
+                    } else if (triggerModule instanceof HttpModule) {
+                        triggerModule.receive(req, res);
                     } else {
                         res.writeHead(404);
                         res.end();
@@ -75,7 +80,8 @@ export class SimpleBootHttpSsr extends SimpleApplication {
                 // console.log('file-->', this.option.publicPath, req.url)
                 // fs.readFile(path.join(this.option.publicPath, (req.url === '/' ? '/index.html' : req.url) ?? ''), (err, data) => {
 
-                fs.readFile(path.join(this.option.publicPath, !req.url?.endsWith('js') ? '/index.html' : req.url ?? ''), (err, data) => {
+                const paths = !(req.url?.endsWith('js') || req.url?.endsWith('map')) ? '/index.html' : req.url ?? '';
+                fs.readFile(path.join(this.option.publicPath, paths), (err, data) => {
                     if (err) {
                         res.writeHead(404);
                         res.end(JSON.stringify(err));

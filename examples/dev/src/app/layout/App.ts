@@ -7,8 +7,9 @@ export class App extends FrontModule {
     constructor() {
         super({
             name: __dirname,
-            template: ssrFetch.text('app.html', App),
-            styleImports: [ssrFetch.text('app.css', App)]
+            template: 'fetch://app.html',
+            styleImports: ['fetch://app.css'],
+            fetcher: ssrFetch
         });
     }
 

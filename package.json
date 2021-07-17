@@ -29,6 +29,8 @@
   },
   "workspaces": [
     "./",
+    "simple-boot-front",
+    "dom-render",
     "examples/dev",
     "templates/http"
   ],
