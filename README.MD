@@ -1,15 +1,13 @@
-SIMPLE-BOOT-HTTP-SERVER
+SIMPLE-BOOT-HTTP-SSR
 ===
 
-
-
-### one source (server, front)
+# one source (server, front)
 ```typescript
+import {ssrFetch} from '@fetch';
 @Sim()
 export class AppRouter extends FrontRouter {
     '' = Index
     '/' = Index
-
     constructor() {
         super('', App);
     }
@@ -20,7 +18,6 @@ export class Index extends FrontModule {
     constructor() {
         super({name: __dirname, template: 'fetch://./index.html', styleImports: ['h1{color:red}'], fetcher: ssrFetch});
     }
-
     public goServer() {
         console.log('goServer')
         ssrFetch.json('/server', {name: 'send msg to server '})
@@ -29,7 +26,7 @@ export class Index extends FrontModule {
 ```
 
 
-### only server side
+# only server side
 ```typescript
 const httpServerOption = new HttpServerOption();
 httpServerOption.publicPath = path.join(__dirname, '..', 'public');
@@ -59,11 +56,6 @@ export class ServerIndex extends HttpModule {
 # server
 ### server.ts
 ```typescript
-import {SimpleBootHttpSsr} from 'simple-boot-http-ssr/SimpleBootHttpSsr';
-import {HttpServerOption} from 'simple-boot-http-ssr/option/HttpServerOption';
-import path from 'path';
-import {frontConfig} from './frontConfig';
-import {ServerRouter} from './app-server/ServerRouter';
 const httpServerOption = new HttpServerOption();
 httpServerOption.publicPath = path.join(__dirname, '..', 'public');
 new SimpleBootHttpSsr(ServerRouter, frontConfig, httpServerOption).run();
@@ -85,9 +77,6 @@ new SimpleBootHttpSsr(ServerRouter, frontConfig, httpServerOption).run();
 # front
 ### index.ts (front)
 ```typescript
-import {SimpleBootFront} from 'simple-boot-front/SimpleBootFront';
-import {AppRouter} from './app/AppRouter';
-import {frontConfig} from './frontConfig';
 const simpleApplication = new SimpleBootFront(AppRouter, frontConfig);
 simpleApplication.run();
 ```
@@ -103,7 +92,7 @@ simpleApplication.run();
 
 
 
-### package.json
+# package.json
 ```json
 {
   "scripts": {
