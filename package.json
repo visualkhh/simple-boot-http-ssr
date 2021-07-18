@@ -1,12 +1,16 @@
 {
   "name": "simple-boot-http-ssr",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "main": "SimpleBootHttpSsr.js",
   "license": "MIT",
   "description": "back end http server frameworks",
   "keywords": [
     "module",
-    "back-end",
+    "simple-boot-front",
+    "server-side-rendering",
+    "SPA",
+    "SSR",
+    "SEO",
     "framwork",
     "node"
   ],
@@ -29,7 +33,6 @@
   },
   "workspaces": [
     "./",
-    "simple-boot-front",
     "examples/dev",
     "templates/node-http"
   ],
