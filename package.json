@@ -81,6 +81,6 @@
   },
   "dependencies": {
     "jsdom": "^16.6.0",
-    "simple-boot-front": "^1.0.53"
+    "simple-boot-front": "^1.0.54"
   }
 }
