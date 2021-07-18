@@ -12,15 +12,18 @@ import {SimFrontOption} from 'simple-boot-front/option/SimFrontOption';
 import {HttpModule} from './module/HttpModule';
 import {DOMWindow, JSDOM} from 'jsdom';
 import {TargetNode, TargetNodeMode} from "dom-render/RootScope";
+import { RouteRender } from 'simple-boot-front/router/RouteRender';
 
-declare var window: DOMWindow;
-declare var document: Document;
-(global as any).window = new JSDOM('<html><body id="app"></body></html>').window;
-(global as any).document = (global as any).window.document;
+// declare var window: DOMWindow;
+// declare var document: Document;
+// (global as any).window = new JSDOM('<html><body id="app"></body></html>').window;
+// (global as any).document = (global as any).window.document;
 export class SimpleBootHttpSsr extends SimpleApplication {
+    public routeRender: RouteRender;
     constructor(public rootRouter: ConstructorType<FrontRouter>, public frontOption: SimFrontOption, public option: HttpServerOption = new HttpServerOption()) {
         super(rootRouter, option);
         this.simstanceManager.storage.set(SimFrontOption, this.frontOption);
+        this.routeRender = new RouteRender(this.frontOption, this.simstanceManager);
     }
 
     public run() {
@@ -84,32 +87,11 @@ export class SimpleBootHttpSsr extends SimpleApplication {
                 })
             } else if (simpleboothttpssr === 'xx') {
                 console.log('--xx');
-                (global as any).window = new JSDOM('<html><body id="app"></body></html>').window;
-                (global as any).document = (global as any).window.document;
                 this.routing<FrontRouter, FrontModule>(intent).then(async it => {
-                    let lastRouterSelector = this.frontOption?.selector;
-                    for (const routerChain of it.routerChains) {
-                        const moduleObj = this.simstanceManager?.getOrNewSim(routerChain.module);
-                        if (moduleObj instanceof FrontModule) {
-                            const option = await (moduleObj as FrontModule).init({router: 'true'});
-                            if (!document.querySelector(`[module-id='${moduleObj?.id}']`)) {
-                                this.render(moduleObj, document.querySelector(lastRouterSelector!));
-                            }
-                            if (moduleObj?._router_outlet_id) {
-                                lastRouterSelector = '#' + moduleObj?._router_outlet_id;
-                            } else {
-                                lastRouterSelector = '#' + moduleObj?.id;
-                            }
-                        }
-                    }
-
-                    // Module render
-                    const module = it.getModuleInstance();
-                    const option = await module.init();
-                    this.render(module, document.querySelector(lastRouterSelector!));
-                    (module as any)._onInitedChild();
-                    it.routerChains.reverse().forEach(it => (this.simstanceManager?.getOrNewSim(it.module) as any)?._onInitedChild());
-                    // console.log(document.body.innerHTML)
+                    const index = await fs.promises.readFile(path.join(this.option.publicPath, 'index.html'), 'utf8');
+                    const window = new JSDOM(index).window;
+                    const document = window.document;
+                    await this.routeRender.routeRender(it, document);
                     res.writeHead(200);
                     res.end(document.documentElement.outerHTML);
                 })
@@ -130,16 +112,5 @@ export class SimpleBootHttpSsr extends SimpleApplication {
             }
         });
         server.listen(this.option.listen.port, this.option.listen.hostname, this.option.listen.backlog, this.option.listen.listeningListener)
-    }
-    /////////
-    public render(module: FrontModule | undefined, targetSelector: Node | null): boolean {
-        if (module && targetSelector) {
-            (module as any)._onInit()
-            module.setScope(new TargetNode(targetSelector, TargetNodeMode.child))
-            module.renderWrap();
-            return true
-        } else {
-            return false
-        }
     }
 }
