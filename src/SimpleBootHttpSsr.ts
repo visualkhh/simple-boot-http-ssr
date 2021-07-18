@@ -1,17 +1,16 @@
-import {SimpleApplication} from 'simple-boot-core/SimpleApplication';
-import {HttpServerOption} from './option/HttpServerOption';
-import {ConstructorType} from 'simple-boot-core/types/Types';
-import {Intent} from 'simple-boot-core/intent/Intent';
-import {URL} from 'url';
-import {IncomingMessage, Server, ServerResponse} from 'http'
-import {FrontRouter} from 'simple-boot-front/router/FrontRouter';
+import { SimpleApplication } from 'simple-boot-core/SimpleApplication';
+import { HttpServerOption } from './option/HttpServerOption';
+import { ConstructorType } from 'simple-boot-core/types/Types';
+import { Intent } from 'simple-boot-core/intent/Intent';
+import { URL } from 'url';
+import { IncomingMessage, Server, ServerResponse } from 'http'
+import { FrontRouter } from 'simple-boot-front/router/FrontRouter';
 import fs from 'fs';
 import path from 'path';
-import {FrontModule} from 'simple-boot-front/module/FrontModule';
-import {SimFrontOption} from 'simple-boot-front/option/SimFrontOption';
-import {HttpModule} from './module/HttpModule';
-import {DOMWindow, JSDOM} from 'jsdom';
-import {TargetNode, TargetNodeMode} from "dom-render/RootScope";
+import { FrontModule } from 'simple-boot-front/module/FrontModule';
+import { SimFrontOption } from 'simple-boot-front/option/SimFrontOption';
+import { HttpModule } from './module/HttpModule';
+import { JSDOM } from 'jsdom';
 import { RouteRender } from 'simple-boot-front/router/RouteRender';
 
 // declare var window: DOMWindow;
@@ -20,6 +19,7 @@ import { RouteRender } from 'simple-boot-front/router/RouteRender';
 // (global as any).document = (global as any).window.document;
 export class SimpleBootHttpSsr extends SimpleApplication {
     public routeRender: RouteRender;
+
     constructor(public rootRouter: ConstructorType<FrontRouter>, public frontOption: SimFrontOption, public option: HttpServerOption = new HttpServerOption()) {
         super(rootRouter, option);
         this.simstanceManager.storage.set(SimFrontOption, this.frontOption);
@@ -36,8 +36,23 @@ export class SimpleBootHttpSsr extends SimpleApplication {
             const targetPath = url.searchParams.get('path');
             const isRouter = url.searchParams.get('router');
 
-            console.log('--22>', req.headers.accept)
-            if (simpleboothttpssr === 'true') {
+            console.log('--request>', req.headers.accept, 'simpleboothttpssr:', simpleboothttpssr)
+            if ((simpleboothttpssr === null || simpleboothttpssr === undefined) && (!(req.url?.endsWith('js') || req.url?.endsWith('map') || req.url?.endsWith('ico')))) {
+                console.log('--xx');
+                this.routing<FrontRouter, FrontModule>(intent).then(async it => {
+                    const index = await fs.promises.readFile(path.join(this.option.publicPath, 'index.html'), 'utf8');
+                    // console.log('html index', index)
+                    const window = new JSDOM(index).window;
+                    const document = window.document;
+                    // console.log('html index docdock', index, document.documentElement.outerHTML)
+                    // console.log('html index docdock', document.documentElement.outerHTML)
+                    await this.routeRender.routeRender(it, document);
+                    res.writeHead(200);
+                    // console.log('--------------')
+                    // console.log(document.documentElement.outerHTML)
+                    res.end(document.documentElement.outerHTML);
+                })
+            } else if (simpleboothttpssr === 'true') {
                 this.routing(intent).then(it => {
                     let triggerModule: FrontModule | undefined;
                     if (isRouter === 'true') {
@@ -85,21 +100,11 @@ export class SimpleBootHttpSsr extends SimpleApplication {
                 }).catch(it => {
                     console.log('catcddh-->', it, intent)
                 })
-            } else if (simpleboothttpssr === 'xx') {
-                console.log('--xx');
-                this.routing<FrontRouter, FrontModule>(intent).then(async it => {
-                    const index = await fs.promises.readFile(path.join(this.option.publicPath, 'index.html'), 'utf8');
-                    const window = new JSDOM(index).window;
-                    const document = window.document;
-                    await this.routeRender.routeRender(it, document);
-                    res.writeHead(200);
-                    res.end(document.documentElement.outerHTML);
-                })
             } else {
                 // console.log('file-->', this.option.publicPath, req.url)
                 // fs.readFile(path.join(this.option.publicPath, (req.url === '/' ? '/index.html' : req.url) ?? ''), (err, data) => {
 
-                const paths = !(req.url?.endsWith('js') || req.url?.endsWith('map')) ? '/index.html' : req.url ?? '';
+                const paths = !(req.url?.endsWith('js') || req.url?.endsWith('map') || req.url?.endsWith('ico')) ? '/index.html' : req.url ?? '';
                 fs.readFile(path.join(this.option.publicPath, paths), (err, data) => {
                     if (err) {
                         res.writeHead(404);
