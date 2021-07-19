@@ -6,8 +6,9 @@
   "scripts": {
     "build": "rm -rf dist && tsc --project tsconfig-ssr.json tsc-alias -p tsconfig-ssr.json --outDir dist --declarationDir dist",
     "build:test": "rm -rf dist && tsc --project tsconfig-ssr.json && tsc-alias -p tsconfig-ssr.json",
-    "watch": "nodemon -e ts -w ./src -w ../../src --exec 'ts-node --project tsconfig-ssr.json -r tsconfig-paths/register src/server.ts'",
+    "watch": "nodemon -e ts -w ./src --exec 'ts-node --project tsconfig-ssr.json -r tsconfig-paths/register src/server.ts'",
     "build:parcel": "rm -rf ./public && parcel build src/index.html --out-dir ./public",
+    "serve:parcel": "rm -rf ./public && parcel --port 3000 src/index.html --out-dir ./public",
     "watch:parcel": "rm -rf ./public && parcel watch src/index.html --out-dir ./public",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -38,6 +39,6 @@
     "typescript": "^4.3.5"
   },
   "dependencies": {
-    "simple-boot-http-ssr": "^1.0.1"
+    "simple-boot-http-ssr": "^1.0.2"
   }
 }

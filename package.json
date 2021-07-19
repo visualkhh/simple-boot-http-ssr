@@ -3,7 +3,7 @@
   "version": "1.0.2",
   "main": "SimpleBootHttpSsr.js",
   "license": "MIT",
-  "description": "back end http server frameworks",
+  "description": "http server ssr frameworks",
   "keywords": [
     "module",
     "simple-boot-front",
