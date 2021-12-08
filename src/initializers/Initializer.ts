@@ -1,3 +1,3 @@
-export interface Initializer<T> {
+export interface Initializer<T = any> {
     run(...args: any[]): Promise<T>;
 }
