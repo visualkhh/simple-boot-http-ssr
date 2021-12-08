@@ -40,7 +40,7 @@ export abstract class SimpleBootHttpSSR {
                         break;
                     }
                 }
-                
+
                 // body.. something..
 
                 // after
@@ -63,8 +63,8 @@ export abstract class SimpleBootHttpSSR {
                 console.log('response-> error', 'url:', req.url, 'status:', res.statusCode, 'uuid:', uuid);
             });
         });
-        server.listen(8081);
         this.startUp(server);
+        server.listen(8081);
     }
     abstract onReady(jsDom: JSDOM.JSDOM, simpleBootFront: SimpleBootFront, initializerReturns: any[]): {filters: Filter[], globalAdvice: Advice, option: HttpServerOption} ;
     abstract startUp(server: Server): void ;
