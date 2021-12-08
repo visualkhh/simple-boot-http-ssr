@@ -3,7 +3,6 @@ import {JsdomInitializer} from './initializers/JsdomInitializer';
 import {Initializer} from './initializers/Initializer';
 import {SimpleBootFront} from 'simple-boot-front/SimpleBootFront';
 import * as JSDOM from 'jsdom';
-// import {JsdomInitializer} from '../initializers/JsdomInitializer';
 
 export abstract class SimpleBootHttpSSR {
 
