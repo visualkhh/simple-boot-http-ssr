@@ -63,8 +63,9 @@ export abstract class SimpleBootHttpSSR {
                 console.log('response-> error', 'url:', req.url, 'status:', res.statusCode, 'uuid:', uuid);
             });
         });
-        this.startUp(server);
-        server.listen(8081);
+        server.listen(8081, () => {
+            this.startUp(server);
+        });
     }
     abstract onReady(jsDom: JSDOM.JSDOM, simpleBootFront: SimpleBootFront, initializerReturns: any[]): {filters: Filter[], globalAdvice: Advice, option: HttpServerOption} ;
     abstract startUp(server: Server): void ;
