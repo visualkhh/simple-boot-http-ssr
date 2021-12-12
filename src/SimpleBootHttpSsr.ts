@@ -53,7 +53,7 @@ export abstract class SimpleBootHttpSSR {
                 // ~~
                 // console.log('after', await this.filterBoot.after(rr));
             } catch (e) {
-                console.error('filter error---', e);
+                console.error('filter error catch call advice', e);
                 const c = await filterAndAdvice.globalAdvice.catch(e, req, res);
             }
             res.on('close', () => {
