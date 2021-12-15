@@ -69,6 +69,7 @@
   "devDependencies": {
     "@types/jest": "^26.0.23",
     "@types/jsdom": "^16.2.13",
+    "@types/mime-types": "^2.1.1",
     "@types/node": "^16.0.0",
     "@typescript-eslint/eslint-plugin": "^4.16.1",
     "@typescript-eslint/parser": "^4.16.1",
@@ -89,6 +90,7 @@
   },
   "dependencies": {
     "jsdom": "^18.1.1",
+    "mime-types": "^2.1.34",
     "simple-boot-front": "9.9.9"
   }
 }
