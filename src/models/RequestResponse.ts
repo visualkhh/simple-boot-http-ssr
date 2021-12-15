@@ -1,6 +1,7 @@
 import { IncomingMessage, ServerResponse } from 'http';
 import jwt, { SignOptions } from 'jsonwebtoken';
 import {HttpHeaders} from '../codes/HttpHeaders';
+import {Mimes} from '../codes/Mimes';
 // https://masteringjs.io/tutorials/node/http-request
 //https://nodejs.org/ko/docs/guides/anatomy-of-an-http-transaction/
 export class RequestResponse {
@@ -22,6 +23,10 @@ export class RequestResponse {
     get reqUrlSearchParamsObj (): {[p: string]: {[p: string]: any}} {
         const entries = this.reqUrlObj.searchParams;
         return Object.fromEntries(entries as any)
+    }
+
+    reqHasAcceptHeader(accept: Mimes | string): boolean {
+        return (this.reqHeaderFirst(HttpHeaders.Accept)??'').indexOf(accept) > -1;
     }
 
     reqBodyJsonData() {

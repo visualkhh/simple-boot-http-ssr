@@ -17,7 +17,8 @@ export class SSRFilter implements Filter {
     async before(req: IncomingMessage, res: ServerResponse) {
         const rr = new RequestResponse(req, res)
         const url = rr.reqUrl ?? '';
-        if ((rr.req.headers.accept ?? Mimes.TextHtml).indexOf(Mimes.TextHtml) >= 0) {
+        // if ((rr.req.headers.accept ?? Mimes.TextHtml).indexOf(Mimes.TextHtml) >= 0) {
+        if (rr.reqHasAcceptHeader(Mimes.TextHtml)) {
             this.navigation.go(url);
             const header = {} as any;
             header[HttpHeaders.ContentType] = Mimes.TextHtml;
