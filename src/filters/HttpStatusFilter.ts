@@ -1,4 +1,4 @@
-import { Filter } from 'simple-boot-http-ssr/filters/Filter';
+import { Filter } from './Filter';
 import {IncomingMessage, ServerResponse} from 'http';
 import {HttpStatus} from '../codes/HttpStatus';
 
