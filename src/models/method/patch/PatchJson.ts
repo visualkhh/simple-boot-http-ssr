@@ -20,7 +20,7 @@ export class PatchJson {
     constructor(private patch: Operation[]) {
     }
 
-    applay(obj: any) {
+    apply(obj: any) {
         obj = jsonpatch.applyPatch(obj, this.patch).newDocument;
         return obj;
         // switch (this.body.op) {
