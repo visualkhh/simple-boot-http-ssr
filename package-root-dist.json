@@ -89,6 +89,7 @@
     "typescript": "^4.3.5"
   },
   "dependencies": {
+    "fast-json-patch": "^3.1.0",
     "jsdom": "^18.1.1",
     "mime-types": "^2.1.34",
     "simple-boot-front": "9.9.9"
