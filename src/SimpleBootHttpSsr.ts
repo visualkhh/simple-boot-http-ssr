@@ -32,7 +32,7 @@ export abstract class SimpleBootHttpSSR {
         for (let initializerElement of this.initializer) {
             initializers.push(await initializerElement.run());
         }
-        const s = await this.simpleBootFrontFactory.factory.createFront(window, this.simpleBootFrontFactory.using, this.simpleBootFrontFactory.domExcludes);
+        const s = await this.simpleBootFrontFactory.factory.createFront(jsDom.window as any, this.simpleBootFrontFactory.using, this.simpleBootFrontFactory.domExcludes);
         const filterAndAdvice = this.onReady(jsDom, s, initializers);
 
         //// start server
