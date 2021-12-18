@@ -19,11 +19,17 @@ export type ReadyParam = {
     option?: HttpServerOption;
 }
 
+export type SimpleBootFrontFactory = { factory: SimpleBootHttpSSRFactory, using: ConstructorType<any>[], domExcludes: ConstructorType<any>[] };
+
 export abstract class SimpleBootHttpSSR {
 
-    constructor(private frontDistPath: string, private simpleBootFrontFactory: { factory: SimpleBootHttpSSRFactory, using: ConstructorType<any>[], domExcludes: ConstructorType<any>[] }, private initializer: Initializer[] = []) {
+    constructor(private frontDistPath: string, public simpleBootFrontFactory: SimpleBootFrontFactory, private initializer: Initializer[] = []) {
         // const animals = ['cat', 'dog', 'mouse'] as const
         // type Animal = typeof initializer
+    }
+
+    getSimpleBootFrontFactory() {
+        return this.simpleBootFrontFactory;
     }
 
     async run() {

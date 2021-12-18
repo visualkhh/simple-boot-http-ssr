@@ -7,21 +7,42 @@ import {SimpleBootFront} from 'simple-boot-front/SimpleBootFront';
 import {HttpStatus} from '../codes/HttpStatus';
 import {HttpHeaders} from '../codes/HttpHeaders';
 import { OnDoneRoute } from 'simple-boot-front/route/OnDoneRoute';
+import { SimpleBootHttpSSRFactory } from '../SimpleBootHttpSSRFactory';
+import { SimpleBootFrontFactory } from '../SimpleBootHttpSsr';
+import fs from 'fs';
+import path from 'path';
+import JSDOM from 'jsdom';
+import { ConstructorType } from 'simple-boot-core/types/Types';
+import { RandomUtils } from 'simple-boot-core/utils/random/RandomUtils';
 
+export type GlobalSimSet = {type: ConstructorType<any>, value: any}
 export class SSRFilter implements Filter, OnDoneRoute {
-    private navigation: Navigation;
 
-    constructor(private simpleBootFront: SimpleBootFront) {
-        this.navigation = simpleBootFront.getSimstanceManager().getOrNewSim(Navigation)!
-        this.simpleBootFront.regDoneRouteCallBack(this);
+    // constructor(private simpleBootFront: SimpleBootFront) {
+    constructor(private frontDistPath: string, private factory: SimpleBootFrontFactory, public sims: GlobalSimSet[] = []) {
     }
 
     async before(req: IncomingMessage, res: ServerResponse) {
         const rr = new RequestResponse(req, res)
         // if ((rr.req.headers.accept ?? Mimes.TextHtml).indexOf(Mimes.TextHtml) >= 0) {
         if (rr.reqHasAcceptHeader(Mimes.TextHtml)) {
-            this.simpleBootFront.pushDoneRouteCallBack(this, rr);
-            this.navigation.go(rr.reqUrl);
+            const indexHTML = fs.readFileSync(path.join(this.frontDistPath, 'index.html'), 'utf8');
+            const jsdom = new JSDOM.JSDOM(indexHTML);
+            jsdom.reconfigure({
+                url: `http://localhost${rr.reqUrl}`,
+            });
+            const window = jsdom.window as unknown as Window & typeof globalThis;
+            const uuid = RandomUtils.getRandomString(10);
+            // console.log('ssrfilter uuid -->', uuid);
+            (window as any).uuid = uuid;
+            const simpleBootFront = await this.factory.factory.createFront(window as any, this.factory.using, this.factory.domExcludes);
+            const simstanceManager = simpleBootFront.getSimstanceManager();
+            this.sims.forEach(it => simstanceManager.set(it.type, it.value));
+            simpleBootFront.regDoneRouteCallBack(this);
+            simpleBootFront.pushDoneRouteCallBack(this, {rr, window});
+            simpleBootFront.run();
+            // const navigation = simpleBootFront.getSimstanceManager().getOrNewSim(Navigation)!;
+            // navigation.go(rr.reqUrl);
             return false;
         } else {
             return true;
@@ -32,11 +53,12 @@ export class SSRFilter implements Filter, OnDoneRoute {
         return true;
     }
 
-    onDoneRoute(rr: RequestResponse): void {
+    onDoneRoute(param: {rr: RequestResponse, window: Window}): void {
+        // console.log('ssrfilter uuid after -->', (param.window as  any).uuid);
         const header = {} as any;
         header[HttpHeaders.ContentType] = Mimes.TextHtml;
-        rr.res.writeHead(HttpStatus.Ok, header);
-        rr.res.end(document.documentElement.outerHTML);
+        param.rr.res.writeHead(HttpStatus.Ok, header);
+        param.rr.res.end(param.window.document.documentElement.outerHTML);
     }
 
 }
