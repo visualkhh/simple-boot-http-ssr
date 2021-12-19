@@ -84,6 +84,23 @@ export class RequestResponse {
         }
     }
 
+    reqSession(): { [key: string]: any} {
+        if ((this.req as any).simpleboot_session === undefined) {
+            (this.req as any).simpleboot_session = {};
+        }
+        return (this.req as any).simpleboot_session;
+    }
+
+    reqSessionSet(key: string, value: any): void {
+        (this.reqSession as any)[key] = value;
+    }
+
+    reqSessionGet<T = any>(key: string): T | undefined {
+        const session = this.reqSession as any;
+        if (session) {
+            return session[key] as T;
+        }
+    }
     // res.on("readable", () => {
     //     console.log('readable???')
     // });
