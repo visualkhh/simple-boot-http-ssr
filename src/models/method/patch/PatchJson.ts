@@ -14,7 +14,7 @@ import jsonpatch, { Operation as JsonOperation } from 'fast-json-patch';
 //     from?: string;
 //     value?: string | any[] | any;
 // }
-export declare type Operation = JsonOperation;
+export type Operation = JsonOperation;
 export class PatchJson {
 
     constructor(private patch: Operation[]) {

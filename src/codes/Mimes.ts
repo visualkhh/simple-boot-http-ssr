@@ -2,6 +2,7 @@ export enum Mimes {
     ApplicationJson = "application/json",
     ApplicationOctetStream = "application/octet-stream",
     ApplicationXml = "application/xml",
+    ApplicationJsonPatch = "application/json-patch+json",
     ApplicationXWwwFormUrlencoded = "application/x-www-form-urlencoded",
     TextPlain = "text/plain",
     TextHtml = "text/html",
@@ -21,4 +22,5 @@ export enum Mimes {
     ImageXBmp = "image/x-bmp",
     ImageXpixmap = "image/x-xpixmap",
     ImageXxbm = "image/x-xbm",
+    MultipartFormData = "multipart/form-data",
 }

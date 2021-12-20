@@ -26,5 +26,10 @@ export enum HttpHeaders {
     // SetHeader = 'Set-Header',
     Cookie2 = 'Cookie2',
     SetCookie2 = 'Set-Cookie2',
-    Location = 'Location'
+    Location = 'Location',
+    IfModifiedSince = 'If-Modified-Since',
+    IfUnmodifiedSince = 'If-Unmodified-Since',
+    IfMatch = 'If-Match',
+    IfNoneMatch = 'If-None-Match',
+    IfRange = 'If-Range'
 }
