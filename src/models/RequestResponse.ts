@@ -64,7 +64,7 @@ export class RequestResponse {
         }
     }
 
-    reqAuthorizationHeader() {
+    public reqAuthorizationHeader() {
         return this.reqHeaderFirst(HttpHeaders.Authorization);
     }
     reqRefreshTokenHeader() {
