@@ -16,11 +16,10 @@ import { ConstructorType } from 'simple-boot-core/types/Types';
 import { RandomUtils } from 'simple-boot-core/utils/random/RandomUtils';
 import {JsdomInitializer} from '../initializers/JsdomInitializer';
 
-export type GlobalSimSet = {type: ConstructorType<any>, value: any}
 export class SSRFilter implements Filter, OnDoneRoute {
 
     // constructor(private simpleBootFront: SimpleBootFront) {
-    constructor(private frontDistPath: string, private factory: SimpleBootFrontFactory, public sims: GlobalSimSet[] = []) {
+    constructor(private frontDistPath: string, private factory: SimpleBootFrontFactory, public otherInstanceSim: Map<ConstructorType<any>, any>) {
     }
 
     async before(req: IncomingMessage, res: ServerResponse) {
@@ -32,10 +31,9 @@ export class SSRFilter implements Filter, OnDoneRoute {
             (window as any).uuid = RandomUtils.getRandomString(10);
             const simpleBootFront = await this.factory.factory.createFront(window as any, this.factory.using, this.factory.domExcludes);
             const simstanceManager = simpleBootFront.getSimstanceManager();
-            this.sims.forEach(it => simstanceManager.set(it.type, it.value));
             simpleBootFront.regDoneRouteCallBack(this);
             simpleBootFront.pushDoneRouteCallBack(this, {rr, window});
-            simpleBootFront.run();
+            simpleBootFront.run(this.otherInstanceSim);
             return false;
         } else {
             return true;
