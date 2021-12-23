@@ -14,6 +14,7 @@ import path from 'path';
 import JSDOM from 'jsdom';
 import { ConstructorType } from 'simple-boot-core/types/Types';
 import { RandomUtils } from 'simple-boot-core/utils/random/RandomUtils';
+import {JsdomInitializer} from '../initializers/JsdomInitializer';
 
 export type GlobalSimSet = {type: ConstructorType<any>, value: any}
 export class SSRFilter implements Filter, OnDoneRoute {
@@ -26,23 +27,15 @@ export class SSRFilter implements Filter, OnDoneRoute {
         const rr = new RequestResponse(req, res)
         // if ((rr.req.headers.accept ?? Mimes.TextHtml).indexOf(Mimes.TextHtml) >= 0) {
         if (rr.reqHasAcceptHeader(Mimes.TextHtml)) {
-            const indexHTML = fs.readFileSync(path.join(this.frontDistPath, 'index.html'), 'utf8');
-            const jsdom = new JSDOM.JSDOM(indexHTML);
-            jsdom.reconfigure({
-                url: `http://localhost${rr.reqUrl}`,
-            });
+            const jsdom = await new JsdomInitializer(this.frontDistPath, {url: `http://localhost${rr.reqUrl}`}).run();
             const window = jsdom.window as unknown as Window & typeof globalThis;
-            const uuid = RandomUtils.getRandomString(10);
-            // console.log('ssrfilter uuid -->', uuid);
-            (window as any).uuid = uuid;
+            (window as any).uuid = RandomUtils.getRandomString(10);
             const simpleBootFront = await this.factory.factory.createFront(window as any, this.factory.using, this.factory.domExcludes);
             const simstanceManager = simpleBootFront.getSimstanceManager();
             this.sims.forEach(it => simstanceManager.set(it.type, it.value));
             simpleBootFront.regDoneRouteCallBack(this);
             simpleBootFront.pushDoneRouteCallBack(this, {rr, window});
             simpleBootFront.run();
-            // const navigation = simpleBootFront.getSimstanceManager().getOrNewSim(Navigation)!;
-            // navigation.go(rr.reqUrl);
             return false;
         } else {
             return true;

@@ -1,14 +1,10 @@
 import {SimpleBootHttpSSRFactory} from './SimpleBootHttpSSRFactory';
-import {JsdomInitializer} from './initializers/JsdomInitializer';
 import {Initializer} from './initializers/Initializer';
-import {SimpleBootFront} from 'simple-boot-front/SimpleBootFront';
-import * as JSDOM from 'jsdom';
 import {ConstructorType} from 'simple-boot-core/types/Types';
 import {Filter} from './filters/Filter';
 import {Advice} from './advices/Advice';
 import {HttpServerOption} from './option/HttpServerOption';
 import {IncomingMessage, Server, ServerResponse} from 'http';
-import {RandomUtils} from 'simple-boot-core/utils/random/RandomUtils';
 import {EndPoint} from './endpoints/EndPoint';
 
 export type ReadyParam = {
@@ -33,13 +29,13 @@ export abstract class SimpleBootHttpSSR {
     }
 
     async run() {
-        const jsDom = await new JsdomInitializer(this.frontDistPath).run();
+        // const jsDom = await new JsdomInitializer(this.frontDistPath).run();
         const initializers = [];
         for (let initializerElement of this.initializer) {
             initializers.push(await initializerElement.run());
         }
-        const s = await this.simpleBootFrontFactory.factory.createFront(jsDom.window as any, this.simpleBootFrontFactory.using, this.simpleBootFrontFactory.domExcludes);
-        const filterAndAdvice = this.onReady(jsDom, s, initializers);
+        // const simpleBootFront = await this.simpleBootFrontFactory.factory.createFront(jsDom.window as any, this.simpleBootFrontFactory.using, this.simpleBootFrontFactory.domExcludes);
+        const filterAndAdvice = this.onReady(initializers);
 
         //// start server
         const server = new Server();
@@ -102,7 +98,7 @@ export abstract class SimpleBootHttpSSR {
         });
     }
 
-    abstract onReady(jsDom: JSDOM.JSDOM, simpleBootFront: SimpleBootFront, initializerReturns: any[]): ReadyParam ;
+    abstract onReady(initializerReturns: any[]): ReadyParam ;
 
     abstract startUp(server: Server): void ;
 

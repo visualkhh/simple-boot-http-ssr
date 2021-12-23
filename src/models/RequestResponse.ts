@@ -2,6 +2,7 @@ import { IncomingMessage, ServerResponse } from 'http';
 import jwt, { SignOptions } from 'jsonwebtoken';
 import {HttpHeaders} from '../codes/HttpHeaders';
 import {Mimes} from '../codes/Mimes';
+import {Intent} from 'simple-boot-core/intent/Intent';
 // https://masteringjs.io/tutorials/node/http-request
 //https://nodejs.org/ko/docs/guides/anatomy-of-an-http-transaction/
 export class RequestResponse {
@@ -25,12 +26,20 @@ export class RequestResponse {
         return Object.fromEntries(entries as any)
     }
 
+    get reqPathSearchParamUrl(): string {
+        const reqUrlObj1 = this.reqUrlObj;
+        return reqUrlObj1.pathname + (reqUrlObj1.searchParams.toString() ? '&'+reqUrlObj1.searchParams.toString() : '' )
+    }
+    get reqIntent() {
+        return new Intent(this.reqPathSearchParamUrl);
+    }
+
     reqHasAcceptHeader(accept: Mimes | string): boolean {
         return (this.reqHeaderFirst(HttpHeaders.Accept)??'').indexOf(accept) > -1;
     }
 
-    reqBodyJsonData() {
-        return new Promise((resolve, reject) => {
+    reqBodyJsonData<T>() {
+        return new Promise<T>((resolve, reject) => {
             let data = '';
             this.req.on('data', (chunk) => data += chunk);
             this.req.on('error', err => reject(err));

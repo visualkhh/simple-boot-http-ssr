@@ -3,17 +3,19 @@ import fs from 'fs';
 import path from 'path';
 // import { ErrorBase } from '@server/errors/ErrorBase';
 import {Initializer} from './Initializer';
+import {ReconfigureSettings} from 'jsdom';
+
 export class JsdomInitializer implements Initializer<JSDOM.JSDOM> {
 
-    constructor(private frontDistPath: string) {
+    constructor(private frontDistPath: string, private reconfigureSettings?:ReconfigureSettings) {
     }
 
     async run() {
         const indexHTML = fs.readFileSync(path.join(this.frontDistPath, 'index.html'), 'utf8');
         const jsdom = new JSDOM.JSDOM(indexHTML);
-        jsdom.reconfigure({
-            url: 'http://localhost',
-        });
+        if (this.reconfigureSettings){
+            jsdom.reconfigure(this.reconfigureSettings);
+        }
         // global setting
         global.document = jsdom.window.document;
         global.window = jsdom.window as unknown as Window & typeof globalThis;
