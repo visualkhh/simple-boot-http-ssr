@@ -15,6 +15,8 @@ import JSDOM from 'jsdom';
 import { ConstructorType } from 'simple-boot-core/types/Types';
 import { RandomUtils } from 'simple-boot-core/utils/random/RandomUtils';
 import {JsdomInitializer} from '../initializers/JsdomInitializer';
+import {RouterModule} from 'simple-boot-core/route/RouterModule';
+import {SimConfig} from 'simple-boot-core/decorators/SimDecorator';
 
 export class SSRFilter implements Filter, OnDoneRoute {
 
@@ -30,7 +32,6 @@ export class SSRFilter implements Filter, OnDoneRoute {
             const window = jsdom.window as unknown as Window & typeof globalThis;
             (window as any).uuid = RandomUtils.getRandomString(10);
             const simpleBootFront = await this.factory.factory.createFront(window as any, this.factory.using, this.factory.domExcludes);
-            const simstanceManager = simpleBootFront.getSimstanceManager();
             simpleBootFront.regDoneRouteCallBack(this);
             simpleBootFront.pushDoneRouteCallBack(this, {rr, window});
             simpleBootFront.run(this.otherInstanceSim);
@@ -44,12 +45,19 @@ export class SSRFilter implements Filter, OnDoneRoute {
         return true;
     }
 
-    onDoneRoute(param: {rr: RequestResponse, window: Window}): void {
-        // console.log('ssrfilter uuid after -->', (param.window as  any).uuid);
+    onDoneRoute(routerModule: RouterModule, param: {rr: RequestResponse, window: Window}): void {
+        console.log('ssrfilter uuid after -->', routerModule);
+        const data = routerModule.onRouteDatas.filter(it => it.simAtomic.getConfig<SimConfig>()?.scheme && it.onRouteData).map(it => {
+            return `window.localStorage.setItem('${it.simAtomic.getConfig<SimConfig>()?.scheme}', '${JSON.stringify(it.onRouteData)}')`;
+        }).join(';');
+        let html = param.window.document.documentElement.outerHTML;
+        if(data) {
+            html = html.replace('</body>', `<script>${data}</script></body>`);
+        }
         const header = {} as any;
         header[HttpHeaders.ContentType] = Mimes.TextHtml;
         param.rr.res.writeHead(HttpStatus.Ok, header);
-        param.rr.res.end(param.window.document.documentElement.outerHTML);
+        param.rr.res.end(html);
     }
 
 }
