@@ -17,6 +17,7 @@ import { RandomUtils } from 'simple-boot-core/utils/random/RandomUtils';
 import {JsdomInitializer} from '../initializers/JsdomInitializer';
 import {RouterModule} from 'simple-boot-core/route/RouterModule';
 import {SimConfig} from 'simple-boot-core/decorators/SimDecorator';
+import { InjectSSRSituationType } from '../decorators/inject/InjectSSRSituationType';
 
 export class SSRFilter implements Filter, OnDoneRoute {
 
@@ -31,7 +32,7 @@ export class SSRFilter implements Filter, OnDoneRoute {
             const jsdom = await new JsdomInitializer(this.frontDistPath, {url: `http://localhost${rr.reqUrl}`}).run();
             const window = jsdom.window as unknown as Window & typeof globalThis;
             (window as any).uuid = RandomUtils.getRandomString(10);
-            const simpleBootFront = await this.factory.factory.createFront(window as any, this.factory.using, this.factory.domExcludes);
+            const simpleBootFront = await this.factory.factory.create(window as any, this.factory.using, this.factory.domExcludes);
             simpleBootFront.regDoneRouteCallBack(this);
             simpleBootFront.pushDoneRouteCallBack(this, {rr, window});
             simpleBootFront.run(this.otherInstanceSim);
@@ -48,7 +49,7 @@ export class SSRFilter implements Filter, OnDoneRoute {
     onDoneRoute(routerModule: RouterModule, param: {rr: RequestResponse, window: Window}): void {
         console.log('ssrfilter uuid after -->', routerModule);
         const data = routerModule.onRouteDatas.filter(it => it.simAtomic.getConfig<SimConfig>()?.scheme && it.onRouteData).map(it => {
-            return `window.localStorage.setItem('${it.simAtomic.getConfig<SimConfig>()?.scheme}', '${JSON.stringify(it.onRouteData)}')`;
+            return `window.localStorage.setItem('${InjectSSRSituationType.RELOAD_INIT_DATA}_${it.simAtomic.getConfig<SimConfig>()?.scheme}', '${JSON.stringify(it.onRouteData)}')`;
         }).join(';');
         let html = param.window.document.documentElement.outerHTML;
         if(data) {
