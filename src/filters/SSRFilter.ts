@@ -16,16 +16,26 @@ import { ConstructorType } from 'simple-boot-core/types/Types';
 import { RandomUtils } from 'simple-boot-core/utils/random/RandomUtils';
 import {JsdomInitializer} from '../initializers/JsdomInitializer';
 import {RouterModule} from 'simple-boot-core/route/RouterModule';
-import {SimConfig} from 'simple-boot-core/decorators/SimDecorator';
-import { InjectSSRSituationType } from '../decorators/inject/InjectSSRSituationType';
+import { getSim, SimConfig } from 'simple-boot-core/decorators/SimDecorator';
+
 
 export class SSRFilter implements Filter, OnDoneRoute {
-
+    // public oneRequestStorage: {[key: string]: any} = {};
     // constructor(private simpleBootFront: SimpleBootFront) {
     constructor(private frontDistPath: string, private factory: SimpleBootFrontFactory, public otherInstanceSim: Map<ConstructorType<any>, any>) {
     }
 
+    // clearOneRequestStorage(key?: string) {
+    //     if (key) {
+    //         delete this.oneRequestStorage[key];
+    //     } else {
+    //         this.oneRequestStorage = {};
+    //     }
+    // }
+
     async before(req: IncomingMessage, res: ServerResponse) {
+        // this.clearOneRequestStorage();
+
         const rr = new RequestResponse(req, res)
         // if ((rr.req.headers.accept ?? Mimes.TextHtml).indexOf(Mimes.TextHtml) >= 0) {
         if (rr.reqHasAcceptHeader(Mimes.TextHtml)) {
@@ -47,13 +57,16 @@ export class SSRFilter implements Filter, OnDoneRoute {
     }
 
     onDoneRoute(routerModule: RouterModule, param: {rr: RequestResponse, window: Window}): void {
-        console.log('ssrfilter uuid after -->', routerModule);
-        const data = routerModule.onRouteDatas.filter(it => it.simAtomic.getConfig<SimConfig>()?.scheme && it.onRouteData).map(it => {
-            return `window.localStorage.setItem('${InjectSSRSituationType.RELOAD_INIT_DATA}_${it.simAtomic.getConfig<SimConfig>()?.scheme}', '${JSON.stringify(it.onRouteData)}')`;
-        }).join(';');
+        const aroundStorage = (window as any).aroundStorage;
+        console.log('ssrfilter uuid after -->');
         let html = param.window.document.documentElement.outerHTML;
-        if(data) {
-            html = html.replace('</body>', `<script>${data}</script></body>`);
+        if (aroundStorage) {
+            const data = Object.entries(aroundStorage).map(([k, v]) => {
+                    return `window.localStorage.setItem('${k}', '${JSON.stringify(v)}')`;
+            }).join(';');
+            if(data) {
+                html = html.replace('</body>', `<script>${data}</script></body>`);
+            }
         }
         const header = {} as any;
         header[HttpHeaders.ContentType] = Mimes.TextHtml;
