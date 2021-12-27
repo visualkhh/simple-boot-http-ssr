@@ -11,8 +11,8 @@ export const SaveAroundAfter = (obj: any, propertyKey: string, args: any[], befo
         }
         if (beforeReturn instanceof Promise) {
             beforeReturn.then((it) => {
-                console.log('SaveAroundAfter', obj, args, beforeReturn);
-                simOption.window.aroundStorage[config.scheme+'_'+propertyKey] = it;
+                // console.log('SaveAroundAfter', obj, args, beforeReturn); 
+                simOption.window.aroundStorage[config.scheme+'_'+propertyKey] = Object.assign({}, it);
                 return it;
             });
         } else {

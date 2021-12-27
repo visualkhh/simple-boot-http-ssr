@@ -58,7 +58,7 @@ export class SSRFilter implements Filter, OnDoneRoute {
 
     onDoneRoute(routerModule: RouterModule, param: {rr: RequestResponse, window: Window}): void {
         const aroundStorage = (window as any).aroundStorage;
-        console.log('ssrfilter uuid after -->');
+        // console.log('ssrfilter uuid after -->');
         let html = param.window.document.documentElement.outerHTML;
         if (aroundStorage) {
             const data = Object.entries(aroundStorage).map(([k, v]) => {
