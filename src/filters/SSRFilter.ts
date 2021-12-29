@@ -62,7 +62,11 @@ export class SSRFilter implements Filter, OnDoneRoute {
         let html = param.window.document.documentElement.outerHTML;
         if (aroundStorage) {
             const data = Object.entries(aroundStorage).map(([k, v]) => {
+                if (typeof v === 'string') {
+                    return `window.localStorage.setItem('${k}', '${v}')`;
+                } else {
                     return `window.localStorage.setItem('${k}', '${JSON.stringify(v)}')`;
+                }
             }).join(';');
             if(data) {
                 html = html.replace('</body>', `<script>${data}</script></body>`);
