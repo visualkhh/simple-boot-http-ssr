@@ -23,6 +23,7 @@ export class JsdomInitializer implements Initializer<JSDOM.JSDOM> {
         global.fetch = (...data: any): Promise<any> => Promise.resolve(dummyResponse);
         global.history = jsdom.window.history;
         global.Event = jsdom.window.Event;
+        global.IntersectionObserver = jsdom.window.IntersectionObserver;
         // @ts-ignore
         // global.Error = ErrorBase;
         global.navigator = jsdom.window.navigator;
