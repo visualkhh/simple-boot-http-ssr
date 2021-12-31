@@ -27,18 +27,12 @@ export class SSRFilter implements Filter {
         // this.clearOneRequestStorage();
 
         const rr = new RequestResponse(req, res)
-        // if ((rr.req.headers.accept ?? Mimes.TextHtml).indexOf(Mimes.TextHtml) >= 0) {
         if (rr.reqHasAcceptHeader(Mimes.TextHtml)) {
             const jsdom = new JsdomInitializer(this.frontDistPath, {url: `http://localhost${rr.reqUrl}`}).run();
             const window = jsdom.window as unknown as Window & typeof globalThis;
             (window as any).uuid = RandomUtils.getRandomString(10);
-            // app.intentManager.simstanceManager.getOrNewSim(SimFrontOption)
-            // const ssrApp = app as SimpleBootHttpSSRServer;
             const option = this.makeSimFrontOption(window)
             const simpleBootFront = await this.factory.factory.create(option, this.factory.using, this.factory.domExcludes);
-            // app.simstanceManager.set(SimFrontOption, simpleBootFront.option);
-            // simpleBootFront.regDoneRouteCallBack(this);
-            // simpleBootFront.pushDoneRouteCallBack(this, {rr, window});
             const data = await simpleBootFront.runRouting(this.otherInstanceSim);
 
             //////////////
@@ -68,8 +62,9 @@ export class SSRFilter implements Filter {
         }
     }
 
-    async after(req: IncomingMessage, res: ServerResponse, app: SimpleBootHttpServer) {
-        return true;
+    async after(req: IncomingMessage, res: ServerResponse, app: SimpleBootHttpServer, sw: boolean) {
+        // console.log('----------', sw)
+        return sw;
     }
 
 }
