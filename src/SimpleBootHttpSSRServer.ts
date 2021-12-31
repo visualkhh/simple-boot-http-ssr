@@ -5,13 +5,14 @@ import { HttpServerOption } from 'simple-boot-http-server/option/HttpServerOptio
 import { SimFrontOption } from 'simple-boot-front/option/SimFrontOption';
 
 export class SimpleBootHttpSSRServer extends SimpleBootHttpServer {
-    constructor(rootRouter: ConstructorType<Object>, option?: HttpServerOption) {
+    constructor(rootRouter: ConstructorType<Object>, public simFrontOption: SimFrontOption, option?: HttpServerOption) {
         super(rootRouter, option)
     }
 
-    run(otherInstanceSim: Map<ConstructorType<any>, any> = new Map<ConstructorType<any>, any>()): Promise<void> {
-        const simFrontOption = new SimFrontOption({} as any)
-        otherInstanceSim.set(SimFrontOption, simFrontOption)
-        return super.run(otherInstanceSim);
+    run(otherInstanceSim?: Map<ConstructorType<any>, any>): Promise<void> {
+        const oi = new Map<ConstructorType<any>, any>()
+        otherInstanceSim?.forEach((value, key) => oi.set(key, value));
+        oi.set(SimFrontOption, this.simFrontOption);
+        return super.run(oi);
     }
 }

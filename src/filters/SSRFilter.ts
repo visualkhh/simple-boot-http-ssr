@@ -28,7 +28,7 @@ export type FactoryAndParams = {
 export class SSRFilter implements Filter, OnDoneRoute {
     // public oneRequestStorage: {[key: string]: any} = {};
     // constructor(private simpleBootFront: SimpleBootFront) {
-    constructor(private frontDistPath: string, private factory: FactoryAndParams, public otherInstanceSim: Map<ConstructorType<any>, any>) {
+    constructor(private frontDistPath: string, public makeSimFrontOption: (window: any) => SimFrontOption,  private factory: FactoryAndParams, public otherInstanceSim: Map<ConstructorType<any>, any>) {
     }
 
     // clearOneRequestStorage(key?: string) {
@@ -49,8 +49,9 @@ export class SSRFilter implements Filter, OnDoneRoute {
             const window = jsdom.window as unknown as Window & typeof globalThis;
             (window as any).uuid = RandomUtils.getRandomString(10);
             // app.intentManager.simstanceManager.getOrNewSim(SimFrontOption)
-            const ssrApp = app as SimpleBootHttpSSRServer;
-            const simpleBootFront = await this.factory.factory.create(window as any, this.factory.using, this.factory.domExcludes);
+            // const ssrApp = app as SimpleBootHttpSSRServer;
+            const option = this.makeSimFrontOption(window)
+            const simpleBootFront = await this.factory.factory.create(option, this.factory.using, this.factory.domExcludes);
             // app.simstanceManager.set(SimFrontOption, simpleBootFront.option);
             simpleBootFront.regDoneRouteCallBack(this);
             simpleBootFront.pushDoneRouteCallBack(this, {rr, window});
