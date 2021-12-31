@@ -1,16 +1,15 @@
 import * as JSDOM from 'jsdom';
 import fs from 'fs';
 import path from 'path';
-// import { ErrorBase } from '@server/errors/ErrorBase';
-import {Initializer} from './Initializer';
+
 import {ReconfigureSettings} from 'jsdom';
 
-export class JsdomInitializer implements Initializer<JSDOM.JSDOM> {
+export class JsdomInitializer {
 
     constructor(private frontDistPath: string, private reconfigureSettings?:ReconfigureSettings) {
     }
 
-    async run() {
+    run(): JSDOM.JSDOM {
         const indexHTML = fs.readFileSync(path.join(this.frontDistPath, 'index.html'), 'utf8');
         const jsdom = new JSDOM.JSDOM(indexHTML);
         if (this.reconfigureSettings){

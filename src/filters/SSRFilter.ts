@@ -1,14 +1,10 @@
-import { Filter } from '../filters/Filter';
-import { Mimes } from '../codes/Mimes';
 import { Navigation } from 'simple-boot-front/service/Navigation';
 import {IncomingMessage, ServerResponse} from 'http';
-import {RequestResponse} from '../models/RequestResponse';
+import {RequestResponse} from 'simple-boot-http-server/models/RequestResponse';
 import {SimpleBootFront} from 'simple-boot-front/SimpleBootFront';
-import {HttpStatus} from '../codes/HttpStatus';
-import {HttpHeaders} from '../codes/HttpHeaders';
+import {HttpHeaders} from 'simple-boot-http-server/codes/HttpHeaders';
 import { OnDoneRoute } from 'simple-boot-front/route/OnDoneRoute';
 import { SimpleBootHttpSSRFactory } from '../SimpleBootHttpSSRFactory';
-import { SimpleBootFrontFactory } from '../SimpleBootHttpSsr';
 import fs from 'fs';
 import path from 'path';
 import JSDOM from 'jsdom';
@@ -17,12 +13,19 @@ import { RandomUtils } from 'simple-boot-core/utils/random/RandomUtils';
 import {JsdomInitializer} from '../initializers/JsdomInitializer';
 import {RouterModule} from 'simple-boot-core/route/RouterModule';
 import { getSim, SimConfig } from 'simple-boot-core/decorators/SimDecorator';
+import { Filter } from 'simple-boot-http-server/filters/Filter';
+import { Mimes } from 'simple-boot-http-server/codes/Mimes';
+import { HttpStatus } from 'simple-boot-http-server/codes/HttpStatus';
 
-
+export type FactoryAndParams = {
+    factory: SimpleBootHttpSSRFactory;
+    using: ConstructorType<any>[];
+    domExcludes: ConstructorType<any>[];
+}
 export class SSRFilter implements Filter, OnDoneRoute {
     // public oneRequestStorage: {[key: string]: any} = {};
     // constructor(private simpleBootFront: SimpleBootFront) {
-    constructor(private frontDistPath: string, private factory: SimpleBootFrontFactory, public otherInstanceSim: Map<ConstructorType<any>, any>) {
+    constructor(private frontDistPath: string, private factory: FactoryAndParams, public otherInstanceSim: Map<ConstructorType<any>, any>) {
     }
 
     // clearOneRequestStorage(key?: string) {
@@ -39,7 +42,7 @@ export class SSRFilter implements Filter, OnDoneRoute {
         const rr = new RequestResponse(req, res)
         // if ((rr.req.headers.accept ?? Mimes.TextHtml).indexOf(Mimes.TextHtml) >= 0) {
         if (rr.reqHasAcceptHeader(Mimes.TextHtml)) {
-            const jsdom = await new JsdomInitializer(this.frontDistPath, {url: `http://localhost${rr.reqUrl}`}).run();
+            const jsdom = new JsdomInitializer(this.frontDistPath, {url: `http://localhost${rr.reqUrl}`}).run();
             const window = jsdom.window as unknown as Window & typeof globalThis;
             (window as any).uuid = RandomUtils.getRandomString(10);
             const simpleBootFront = await this.factory.factory.create(window as any, this.factory.using, this.factory.domExcludes);
