@@ -16,6 +16,9 @@ import { getSim, SimConfig } from 'simple-boot-core/decorators/SimDecorator';
 import { Filter } from 'simple-boot-http-server/filters/Filter';
 import { Mimes } from 'simple-boot-http-server/codes/Mimes';
 import { HttpStatus } from 'simple-boot-http-server/codes/HttpStatus';
+import { SimpleBootHttpServer } from 'simple-boot-http-server';
+import { SimFrontOption } from 'simple-boot-front/option/SimFrontOption';
+import { SimpleBootHttpSSRServer } from 'SimpleBootHttpSSRServer';
 
 export type FactoryAndParams = {
     factory: SimpleBootHttpSSRFactory;
@@ -36,7 +39,7 @@ export class SSRFilter implements Filter, OnDoneRoute {
     //     }
     // }
 
-    async before(req: IncomingMessage, res: ServerResponse) {
+    async before(req: IncomingMessage, res: ServerResponse, app: SimpleBootHttpServer) {
         // this.clearOneRequestStorage();
 
         const rr = new RequestResponse(req, res)
@@ -45,7 +48,10 @@ export class SSRFilter implements Filter, OnDoneRoute {
             const jsdom = new JsdomInitializer(this.frontDistPath, {url: `http://localhost${rr.reqUrl}`}).run();
             const window = jsdom.window as unknown as Window & typeof globalThis;
             (window as any).uuid = RandomUtils.getRandomString(10);
+            // app.intentManager.simstanceManager.getOrNewSim(SimFrontOption)
+            const ssrApp = app as SimpleBootHttpSSRServer;
             const simpleBootFront = await this.factory.factory.create(window as any, this.factory.using, this.factory.domExcludes);
+            // app.simstanceManager.set(SimFrontOption, simpleBootFront.option);
             simpleBootFront.regDoneRouteCallBack(this);
             simpleBootFront.pushDoneRouteCallBack(this, {rr, window});
             simpleBootFront.run(this.otherInstanceSim);
@@ -55,7 +61,7 @@ export class SSRFilter implements Filter, OnDoneRoute {
         }
     }
 
-    async after(req: IncomingMessage, res: ServerResponse) {
+    async after(req: IncomingMessage, res: ServerResponse, app: SimpleBootHttpServer) {
         return true;
     }
 
