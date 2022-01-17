@@ -12,6 +12,7 @@ import {SimpleBootHttpServer} from 'simple-boot-http-server';
 import {SimFrontOption} from 'simple-boot-front/option/SimFrontOption';
 import {SimpleBootFront} from 'simple-boot-front/SimpleBootFront';
 import {Intent} from 'simple-boot-core/intent/Intent';
+import {SimAtomic} from 'simple-boot-core/simstance/SimAtomic';
 
 export type SSRFilterOption = {
     frontDistPath: string;
@@ -50,7 +51,7 @@ export class SSRFilter implements Filter {
         const now = Date.now();
         if (this.rootSimpleBootFront && rr.reqHasAcceptHeader(Mimes.TextHtml)) {
             // notfound catched!!
-            const route = await this.rootSimpleBootFront.routing(new Intent(rr.reqUrl));
+            const route = await this.rootSimpleBootFront.routing<SimAtomic, any>(new Intent(rr.reqUrl));
             if(!route.module && this.notFoundHtml){
                 this.writeOkHtmlAndEnd({rr, status: HttpStatus.NotFound}, this.notFoundHtml);
                 return false;
