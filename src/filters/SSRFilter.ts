@@ -60,7 +60,7 @@ export class SSRFilter implements Filter {
             if (this.option.cacheMiliSecond && this.cache.has(rr.reqUrl)) {
                 const data = this.cache.get(rr.reqUrl)!;
                 if ((now - data.createTime) < this.option.cacheMiliSecond) {
-                    this.writeOkHtmlAndEnd({rr, status: HttpStatus.NotFound}, data.html);
+                    this.writeOkHtmlAndEnd({rr}, data.html);
                     return false;
                 }
             }
@@ -94,7 +94,9 @@ export class SSRFilter implements Filter {
     }
 
     writeOkHtmlAndEnd({rr, status = HttpStatus.Ok}: {rr: RequestResponse, status?: HttpStatus}, html: string) {
-        rr.res.writeHead(status, {[HttpHeaders.ContentType]: Mimes.TextHtml});
+        // rr.res.writeHead(status, {[HttpHeaders.ContentType]: Mimes.TextHtml});
+        rr.res.statusCode = status;
+        rr.res.setHeader(HttpHeaders.ContentType, Mimes.TextHtml);
         rr.res.end(html);
     }
     async after(req: IncomingMessage, res: ServerResponse, app: SimpleBootHttpServer, sw: boolean) {
