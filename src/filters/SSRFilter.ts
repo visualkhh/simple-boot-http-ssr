@@ -1,19 +1,22 @@
 import {IncomingMessage, ServerResponse} from 'http';
 import {RequestResponse} from 'simple-boot-http-server/models/RequestResponse';
 import {HttpHeaders} from 'simple-boot-http-server/codes/HttpHeaders';
-import { SimpleBootHttpSSRFactory } from '../SimpleBootHttpSSRFactory';
-import { ConstructorType } from 'simple-boot-core/types/Types';
-import { RandomUtils } from 'simple-boot-core/utils/random/RandomUtils';
+import {SimpleBootHttpSSRFactory} from '../SimpleBootHttpSSRFactory';
+import {ConstructorType} from 'simple-boot-core/types/Types';
+import {RandomUtils} from 'simple-boot-core/utils/random/RandomUtils';
 import {JsdomInitializer} from '../initializers/JsdomInitializer';
-import {RouterModule} from 'simple-boot-core/route/RouterModule';
-import { Filter } from 'simple-boot-http-server/filters/Filter';
-import { Mimes } from 'simple-boot-http-server/codes/Mimes';
-import { HttpStatus } from 'simple-boot-http-server/codes/HttpStatus';
-import { SimpleBootHttpServer } from 'simple-boot-http-server';
-import { SimFrontOption } from 'simple-boot-front/option/SimFrontOption';
+import {Filter} from 'simple-boot-http-server/filters/Filter';
+import {Mimes} from 'simple-boot-http-server/codes/Mimes';
+import {HttpStatus} from 'simple-boot-http-server/codes/HttpStatus';
+import {SimpleBootHttpServer} from 'simple-boot-http-server';
+import {SimFrontOption} from 'simple-boot-front/option/SimFrontOption';
+import {SimpleBootFront} from 'simple-boot-front/SimpleBootFront';
+import {Intent} from 'simple-boot-core/intent/Intent';
+
 export type SSRFilterOption = {
     frontDistPath: string;
     cacheMiliSecond?: number;
+    notFoundUrl?: string;
 }
 export type FactoryAndParams = {
     factory: SimpleBootHttpSSRFactory;
@@ -22,9 +25,22 @@ export type FactoryAndParams = {
 }
 export class SSRFilter implements Filter {
     private cache = new Map<string, {html: string, createTime: number}>();
+    notFoundHtml?: string;
     // public oneRequestStorage: {[key: string]: any} = {};
     // constructor(private simpleBootFront: SimpleBootFront) {
+    private rootSimpleBootFront?: SimpleBootFront;
     constructor(private option: SSRFilterOption, public makeSimFrontOption: (window: any) => SimFrontOption,  private factory: FactoryAndParams, public otherInstanceSim: Map<ConstructorType<any>, any>) {
+        const jsdom = new JsdomInitializer(this.option.frontDistPath, {url: `http://localhost`}).run();
+        const window = jsdom.window as unknown as Window & typeof globalThis;
+        (window as any).uuid = 'root-' + RandomUtils.getRandomString(10);
+        this.factory.factory.create(this.makeSimFrontOption(window), this.factory.using, this.factory.domExcludes).then(async (it) => {
+            this.rootSimpleBootFront = it;
+            this.rootSimpleBootFront.run(otherInstanceSim);
+            if (this.option.notFoundUrl) {
+                const res = await this.rootSimpleBootFront.goRouting(this.option.notFoundUrl);
+                this.notFoundHtml = window.document.documentElement.outerHTML;
+            }
+        });
     }
 
     async before(req: IncomingMessage, res: ServerResponse, app: SimpleBootHttpServer) {
@@ -32,12 +48,19 @@ export class SSRFilter implements Filter {
 
         const rr = new RequestResponse(req, res)
         const now = Date.now();
-        if (rr.reqHasAcceptHeader(Mimes.TextHtml)) {
+        if (this.rootSimpleBootFront && rr.reqHasAcceptHeader(Mimes.TextHtml)) {
+            // notfound catched!!
+            const route = await this.rootSimpleBootFront.routing(new Intent(rr.reqUrl));
+            if(!route.module && this.notFoundHtml){
+                this.writeOkHtmlAndEnd({rr, status: HttpStatus.NotFound}, this.notFoundHtml);
+                return false;
+            }
+
             // cache
             if (this.option.cacheMiliSecond && this.cache.has(rr.reqUrl)) {
                 const data = this.cache.get(rr.reqUrl)!;
                 if ((now - data.createTime) < this.option.cacheMiliSecond) {
-                    this.writeOkHtmlAndEnd(rr, data.html);
+                    this.writeOkHtmlAndEnd({rr, status: HttpStatus.NotFound}, data.html);
                     return false;
                 }
             }
@@ -63,15 +86,15 @@ export class SSRFilter implements Filter {
                     html = html.replace('</body>', `<script>${data}</script></body>`);
                 }
             }
-            this.writeOkHtmlAndEnd(rr, html);
+            this.writeOkHtmlAndEnd({rr}, html);
             return false;
         } else {
             return true;
         }
     }
 
-    writeOkHtmlAndEnd(rr: RequestResponse, html: string) {
-        rr.res.writeHead(HttpStatus.Ok, {[HttpHeaders.ContentType]: Mimes.TextHtml});
+    writeOkHtmlAndEnd({rr, status = HttpStatus.Ok}: {rr: RequestResponse, status?: HttpStatus}, html: string) {
+        rr.res.writeHead(status, {[HttpHeaders.ContentType]: Mimes.TextHtml});
         rr.res.end(html);
     }
     async after(req: IncomingMessage, res: ServerResponse, app: SimpleBootHttpServer, sw: boolean) {
