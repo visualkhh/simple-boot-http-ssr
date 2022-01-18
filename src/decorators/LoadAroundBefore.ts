@@ -1,6 +1,6 @@
 import { getSim } from 'simple-boot-core/decorators/SimDecorator';
 import { AroundForceReturn } from 'simple-boot-core/decorators/aop/AOPDecorator';
-import { StorageUtils } from 'simple-boot-front/utils/storage/StorageUtils';
+import { StorageUtils } from 'dom-render/utils/storage/StorageUtils';
 import { ReflectUtils } from 'simple-boot-core/utils/reflect/ReflectUtils';
 
 export const LoadAroundBefore = (obj: any, propertyKey: string, args: any[]) => {
