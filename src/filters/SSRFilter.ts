@@ -49,7 +49,7 @@ export class SSRFilter implements Filter {
 
         const rr = new RequestResponse(req, res)
         const now = Date.now();
-        if (this.rootSimpleBootFront && rr.reqHasAcceptHeader(Mimes.TextHtml)) {
+        if (this.rootSimpleBootFront && (rr.reqHasAcceptHeader(Mimes.TextHtml) || rr.reqHasAcceptHeader(Mimes.All))) {
             // notfound catched!!
             const route = await this.rootSimpleBootFront.routing<SimAtomic, any>(new Intent(rr.reqUrl));
             if(!route.module && this.notFoundHtml){
