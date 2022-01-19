@@ -26,7 +26,7 @@ export type FactoryAndParams = {
 }
 export class SSRFilter implements Filter {
     private cache = new Map<string, {html: string, createTime: number}>();
-    notFoundHtml?: string;
+    // notFoundHtml?: string;
     // public oneRequestStorage: {[key: string]: any} = {};
     // constructor(private simpleBootFront: SimpleBootFront) {
     private rootSimpleBootFront?: SimpleBootFront;
@@ -37,10 +37,10 @@ export class SSRFilter implements Filter {
         this.factory.factory.create(this.makeSimFrontOption(window), this.factory.using, this.factory.domExcludes).then(async (it) => {
             this.rootSimpleBootFront = it;
             this.rootSimpleBootFront.run(otherInstanceSim);
-            if (this.option.notFoundUrl) {
-                const res = await this.rootSimpleBootFront.goRouting(this.option.notFoundUrl);
-                this.notFoundHtml = window.document.documentElement.outerHTML;
-            }
+            // if (this.option.notFoundUrl) {
+            //     const res = await this.rootSimpleBootFront.goRouting(this.option.notFoundUrl);
+            //     this.notFoundHtml = window.document.documentElement.outerHTML;
+            // }
         });
     }
 
@@ -51,42 +51,61 @@ export class SSRFilter implements Filter {
         const now = Date.now();
         if (this.rootSimpleBootFront && (rr.reqHasAcceptHeader(Mimes.TextHtml) || rr.reqHasAcceptHeader(Mimes.All))) {
             // notfound catched!!
-            const route = await this.rootSimpleBootFront.routing<SimAtomic, any>(new Intent(rr.reqUrl));
-            if(!route.module && this.notFoundHtml){
-                this.writeOkHtmlAndEnd({rr, status: HttpStatus.NotFound}, this.notFoundHtml);
-                return false;
-            }
+            // const route = await this.rootSimpleBootFront.routing<SimAtomic, any>(new Intent(rr.reqUrl));
+            // if(!route.module && this.notFoundHtml){
+            //     this.writeOkHtmlAndEnd({rr, status: HttpStatus.NotFound}, this.notFoundHtml);
+            //     return false;
+            // }
+            //
+            // // cache
+            // if (this.option.cacheMiliSecond && this.cache.has(rr.reqUrl)) {
+            //     const data = this.cache.get(rr.reqUrl)!;
+            //     if ((now - data.createTime) < this.option.cacheMiliSecond) {
+            //         this.writeOkHtmlAndEnd({rr}, data.html);
+            //         return false;
+            //     }
+            // }
 
-            // cache
-            if (this.option.cacheMiliSecond && this.cache.has(rr.reqUrl)) {
-                const data = this.cache.get(rr.reqUrl)!;
-                if ((now - data.createTime) < this.option.cacheMiliSecond) {
-                    this.writeOkHtmlAndEnd({rr}, data.html);
-                    return false;
-                }
-            }
-            const jsdom = new JsdomInitializer(this.option.frontDistPath, {url: `http://localhost${rr.reqUrl}`}).run();
-            const window = jsdom.window as unknown as Window & typeof globalThis;
-            (window as any).uuid = RandomUtils.getRandomString(10);
-            const option = this.makeSimFrontOption(window)
-            const simpleBootFront = await this.factory.factory.create(option, this.factory.using, this.factory.domExcludes);
-            const data = await simpleBootFront.runRouting(this.otherInstanceSim);
-            //////////////
-            const aroundStorage = (window as any).aroundStorage;
-            let html = window.document.documentElement.outerHTML;
-            this.cache.set(rr.reqUrl, {html, createTime: now});
-            if (aroundStorage) {
-                const data = Object.entries(aroundStorage).map(([k, v]) => {
-                    if (typeof v === 'string') {
-                        return `window.localStorage.setItem('${k}', '${v}')`;
-                    } else {
-                        return `window.localStorage.setItem('${k}', '${JSON.stringify(v)}')`;
-                    }
-                }).join(';');
-                if(data) {
-                    html = html.replace('</body>', `<script>${data}</script></body>`);
-                }
-            }
+            // const rootTimerLabel = 'rootTimerLabel';
+            // console.time(rootTimerLabel);
+            // const data = await this.rootSimpleBootFront.runRouting(this.otherInstanceSim, rr.reqUrl);
+            const data = await this.rootSimpleBootFront.goRouting(rr.reqUrl);
+            let html = this.rootSimpleBootFront.option.window.document.documentElement.outerHTML;
+            // console.timeEnd(rootTimerLabel);
+            // const jsDomTimerLabel = 'jsDomTimerLabel';
+            // const frontTimerLabel = 'frontTimerLabel';
+            // const frontRoutingTimerLabel = 'frontRoutingTimerLabel';
+            // console.time(jsDomTimerLabel);
+            // const jsdom = new JsdomInitializer(this.option.frontDistPath, {url: `http://localhost${rr.reqUrl}`}).run();
+            // console.timeEnd(jsDomTimerLabel);
+            //
+            // console.time(frontTimerLabel);
+            // const window = jsdom.window as unknown as Window & typeof globalThis;
+            // (window as any).uuid = RandomUtils.getRandomString(10);
+            // const option = this.makeSimFrontOption(window)
+            // const simpleBootFront = await this.factory.factory.create(option, this.factory.using, this.factory.domExcludes);
+            // console.timeEnd(frontTimerLabel);
+            //
+            // console.time(frontRoutingTimerLabel);
+            // const data = await simpleBootFront.runRouting(this.otherInstanceSim);
+            // //////////////
+            // const aroundStorage = (window as any).aroundStorage;
+            // let html = window.document.documentElement.outerHTML;
+            // this.cache.set(rr.reqUrl, {html, createTime: now});
+            //
+            // if (aroundStorage) {
+            //     const data = Object.entries(aroundStorage).map(([k, v]) => {
+            //         if (typeof v === 'string') {
+            //             return `window.localStorage.setItem('${k}', '${v}')`;
+            //         } else {
+            //             return `window.localStorage.setItem('${k}', '${JSON.stringify(v)}')`;
+            //         }
+            //     }).join(';');
+            //     if(data) {
+            //         html = html.replace('</body>', `<script>${data}</script></body>`);
+            //     }
+            // }
+            // console.timeEnd(frontRoutingTimerLabel);
             this.writeOkHtmlAndEnd({rr}, html);
             return false;
         } else {
