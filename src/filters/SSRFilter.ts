@@ -51,7 +51,7 @@ export class SSRFilter implements Filter {
                 await this.pushQueue()
             }
         })().then(it => {
-            console.log('SSRFilter init');
+            // console.log('SSRFilter init');
         })
     }
 
