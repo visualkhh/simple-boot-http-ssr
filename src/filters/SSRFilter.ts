@@ -113,13 +113,13 @@ export class SSRFilter implements Filter {
                 if (aroundStorage) {
                     const data = Object.entries(aroundStorage).map(([k, v]) => {
                         if (typeof v === 'string') {
-                            return `window.localStorage.setItem('${k}', '${v}')`;
+                            return `window.server_data_${k} = ${v}`;
                         } else {
-                            return `window.localStorage.setItem('${k}', '${JSON.stringify(v)}')`;
+                            return `window.server_data_${k} = ${JSON.stringify(v)}`;
                         }
                     }).join(';');
                     if(data) {
-                        html = html.replace('</body>', `<script>${data}</script></body>`);
+                        html = html.replace('</head>', `<script> ${data}; </script></head>`);
                     }
                 }
 

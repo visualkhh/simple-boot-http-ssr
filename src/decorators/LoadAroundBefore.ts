@@ -8,9 +8,11 @@ export const LoadAroundBefore = (obj: any, propertyKey: string, args: any[]) => 
     const simOption = obj._SimpleBoot_simOption;
     const config = getSim(obj);
     if (simstanceManager && simOption && config?.scheme) {
+        const key = config.scheme + '_' + propertyKey;
         const type = ReflectUtils.getReturnType(obj, propertyKey);
-        const data = StorageUtils.cutLocalStorageJsonItem<any>(config.scheme + '_' + propertyKey, simOption.window);
+        const data = simOption.window[`server_data_${key}`]; //StorageUtils.cutLocalStorageJsonItem<any>(config.scheme + '_' + propertyKey, simOption.window);
         if (data) {
+            delete simOption.window[`server_data_${key}`];
             let rdata = undefined;
             if (type === Promise) {
                 rdata = Promise.resolve(data);
