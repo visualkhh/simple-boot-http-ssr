@@ -104,29 +104,30 @@ export class SSRFilter implements Filter {
             try {
                 // console.log('SSRFilter before-->' , simpleBootFront.option.name, 'poolLength:',this.simpleBootFrontPool.length);
                 (simpleBootFront.option.window as any).ssrUse = true;
-                delete (simpleBootFront.option.window as any).aroundStorage;
+                delete (simpleBootFront.option.window as any).server_side_data;
 
+                //runRouting!!
                 const data = await simpleBootFront.goRouting(rr.reqUrl);
                 let html = simpleBootFront.option.window.document.documentElement.outerHTML;
 
-                const aroundStorage = (simpleBootFront.option.window as any).aroundStorage;
-                if (aroundStorage) {
-                    const data = Object.entries(aroundStorage).map(([k, v]) => {
+                const serverSideData = (simpleBootFront.option.window as any).server_side_data;
+                if (serverSideData) {
+                    const data = Object.entries(serverSideData).map(([k, v]) => {
                         if (typeof v === 'string') {
-                            return `window.server_data_${k} = ${v}`;
+                            return `window.server_side_data.${k} = ${v}`;
                         } else {
-                            return `window.server_data_${k} = ${JSON.stringify(v)}`;
+                            return `window.server_side_data.${k} = ${JSON.stringify(v)}`;
                         }
                     }).join(';');
                     if(data) {
-                        html = html.replace('</head>', `<script> ${data}; </script></head>`);
+                        html = html.replace('</head>', `<script> window.server_side_data={}; ${data}; </script></head>`);
                     }
                 }
 
                 this.writeOkHtmlAndEnd({rr}, html);
             } finally {
                 (simpleBootFront.option.window as any).ssrUse = false;
-                delete (simpleBootFront.option.window as any).aroundStorage;
+                delete (simpleBootFront.option.window as any).server_side_data;
                 this.simpleBootFrontQueue.enqueue(simpleBootFront);
             }
             return false;
