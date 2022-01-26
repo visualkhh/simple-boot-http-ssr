@@ -71,12 +71,12 @@ export class SSRFilter implements Filter {
     }
 
     async before(req: IncomingMessage, res: ServerResponse, app: SimpleBootHttpServer) {
-        // console.log('SSRFilter before start===================', this.simpleBootFrontQueue.isEmpty(), new Date());
+        const now = Date.now();
+        console.log('SSRFilter before start===================', this.simpleBootFrontQueue.isEmpty(), this.simpleBootFrontPool.length, now);
         // 무조건 promise로 await 해야 함
         // this.clearOneRequestStorage();
         // this.simpleBootFrontQueue.enqueue()
         const rr = new RequestResponse(req, res)
-        const now = Date.now();
         if ((rr.reqHasAcceptHeader(Mimes.TextHtml) || rr.reqHasAcceptHeader(Mimes.All))) {
             if (this.simpleBootFrontQueue.isEmpty()) {
                 await this.pushQueue();
@@ -98,8 +98,8 @@ export class SSRFilter implements Filter {
             //     }
             // }
 
-            // const rootTimerLabel = 'rootTimerLabel';
-            // console.time(rootTimerLabel);
+            const rootTimerLabel = 'rootTimerLabel';
+            console.time(rootTimerLabel);
             // const data = await this.rootSimpleBootFront.runRouting(this.otherInstanceSim, rr.reqUrl);
             try {
                 // console.log('SSRFilter before-->' , simpleBootFront.option.name, 'poolLength:',this.simpleBootFrontPool.length);
@@ -130,8 +130,8 @@ export class SSRFilter implements Filter {
                 delete (simpleBootFront.option.window as any).server_side_data;
                 this.simpleBootFrontQueue.enqueue(simpleBootFront);
             }
+            console.timeEnd(rootTimerLabel);
             return false;
-            // console.timeEnd(rootTimerLabel);
             // const jsDomTimerLabel = 'jsDomTimerLabel';
             // const frontTimerLabel = 'frontTimerLabel';
             // const frontRoutingTimerLabel = 'frontRoutingTimerLabel';
