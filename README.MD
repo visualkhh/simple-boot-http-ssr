@@ -1,113 +1,84 @@
 SIMPLE-BOOT-HTTP-SSR
 ===
 
-# one source (server, front)
+# frontend
 ```typescript
-import {ssrFetch} from '@fetch';
-@Sim()
-export class AppRouter extends FrontRouter {
-    '' = Index
-    '/' = Index
-    constructor() {
-        super('', App);
-    }
-}
+const using = [
+    AnonServiceFront, AuthServiceFront,
+    LiveServiceFront, AuthMsgServiceFront,
+    AuthPetServiceFront, MyServiceFront,
+    AnonPetServiceFront
+];
+Factory.create(MakeSimFrontOption(window), using).then(it => {
+    it.run()
+});
 
-@Sim()
-export class Index extends FrontModule {
-    constructor() {
-        super({name: __dirname, template: 'fetch://./index.html', styleImports: ['h1{color:red}'], fetcher: ssrFetch});
-    }
-    public goServer() {
-        console.log('goServer')
-        ssrFetch.json('/server', {name: 'send msg to server '})
-    }
-}
 ```
-
-
-# only server side
-```typescript
-const httpServerOption = new HttpServerOption();
-httpServerOption.publicPath = path.join(__dirname, '..', 'public');
-new SimpleBootHttpSsr(ServerRouter, frontConfig, httpServerOption).run();
-
-@Sim()
-export class ServerRouter extends AppRouter {
-    '/server' = ServerIndex
-}
-
-@Sim()
-export class ServerIndex extends HttpModule {
-    receive(req: IncomingMessage, res: ServerResponse) {
-        req.on('data', chunk => {
-            console.log('-->', chunk.toString());
-        });
-        req.on('end', () => {
-            res.setHeader('Content-Type', 'application/json');
-            res.write(JSON.stringify({status: 'ok'}));
-            res.end();
-        });
-    }
-}
-```
-
-
 # server
-### server.ts
 ```typescript
-const httpServerOption = new HttpServerOption();
-httpServerOption.publicPath = path.join(__dirname, '..', 'public');
-new SimpleBootHttpSsr(ServerRouter, frontConfig, httpServerOption).run();
+Promise.all([logger, transporter, new JsdomInitializer(environment.frontDistPath).run(), new DBInitializer().run()]).then(async ([log, email, jsdom, connection]) => {
+
+    await cacheScheduleManager.run(connection);
+
+    const otherInstanceSim = new Map<ConstructorType<any>, any>();
+    otherInstanceSim.set(Connection, connection);
+
+    const option = new HttpServerOption();
+    option.listen = environment.httpServerConfig.listen;
+    option.globalAdvice = new GlobalAdvice();
+    option.requestEndPoints = [new RequestLogEndPoint()];
+    option.closeEndPoints = [new CloseLogEndPoint()];
+    option.errorEndPoints = [new ErrorLogEndPoint()];
+
+    const using = [
+        AnonServiceServer, AuthServiceServer,
+        LiveServiceServer, AuthMsgServiceServer,
+        AuthPetServiceServer, MyServiceServer,
+        AnonPetServiceServer
+    ];
+
+    const resourceFilter = new ResourceFilter(environment.frontDistPath,
+        ['\.js$', '\.map$', '\.ico$', '\.png$', '\.jpg$', '\.jpeg$', '\.gif$', 'offline\.html$', 'webmanifest$', 'manifest\.json', 'service-worker\.js$']
+    );
+    option.filters = [
+        new ThrowFilter(new NotFoundError()),
+        resourceFilter,
+        // 30minutes cache
+        new SSRFilter({
+            frontDistPath: environment.frontDistPath,
+            factorySimFrontOption: (window: any) => MakeSimFrontOption(window),
+            factory: Factory,
+            poolOption: {
+                max: 50,
+                min: 1,
+            },
+            using,
+            domExcludes: [Connection, EntityManager, EntityManagerFactory]
+        }, otherInstanceSim),
+        SecurityFilter,
+        IntentFilter,
+    ];
+
+    const ssr = new SimpleBootHttpSSRServer(IndexRouter, option);
+    ssr.run(otherInstanceSim);
+    return ssr;
+}).then(it => {
+    console.log('server startUp finish!!', it.option.listen);
+});
 ```
-### tsconfig-ssr.json
-```json
-{
-  "extends": "./tsconfig.json",
-  "compilerOptions": {
-    "paths": {
-      "@fetch": ["./node_modules/simple-boot-http-ssr/fetch/server"]
+
+# common
+```typescript
+export const MakeSimFrontOption = (window: any) : SimFrontOption => {
+    return new SimFrontOption(window).setUrlType(UrlType.path);
+}
+
+class Factory extends SimpleBootHttpSSRFactory {
+    factory(simFrontOption: SimFrontOption, using: ConstructorType<any>[] = [], domExcludes: ConstructorType<any>[] = []): Promise<SimpleBootFront> {
+        const simpleBootFront = new SimpleBootFront(IndexRouterComponent, simFrontOption);
+        simpleBootFront.domRendoerExcludeProxy.push(Subject, Observable, Subscription, ...domExcludes);
+        return Promise.resolve(simpleBootFront);
     }
-  }
 }
-
-```
-
-
-# front
-### index.ts (front)
-```typescript
-const simpleApplication = new SimpleBootFront(AppRouter, frontConfig);
-simpleApplication.run();
-```
-### tsconfig.json
-```json
-{
-  "paths": {
-    "@fetch": ["./node_modules/simple-boot-http-ssr/fetch/front"]
-  }
-}
-```
-
-
-
-
-# package.json
-```json
-{
-  "scripts": {
-    "watch": "nodemon -e ts -w ./src -w ../../src --exec 'ts-node --project tsconfig-ssr.json -r tsconfig-paths/register src/server.ts'",
-    "watch:test": "nodemon --watch 'src/*.ts' --ignore 'src/**/*.spec.ts' --exec 'echo 11'",
-    "start": "ts-node --project tsconfig-ssr.json -r tsconfig-paths/register src/server.ts",
-    "build": "tsc src/server.ts",
-    "build:server": "parcel build src/server.ts --target node",
-    "build:tt": "rm -rf build && parcel build src/index.ts --out-dir build --no-source-maps",
-    "build:parcel": "rm -rf ./public && parcel build src/index.html --out-dir ./public",
-    "watch:parcel": "rm -rf ./public && parcel watch src/index.html --out-dir ./public",
-    "start:parcel": "rm -rf ./public && parcel --port 3000 src/index.html ./public",
-    "dev": "ts-node-dev --respawn  --project tsconfig-ssr.json -r tsconfig-paths/register src/index.ts",
-    "build:prod": "cross-env NODE_ENV=production parcel build src/index.html --public-url .",
-    "test": "jest --detectOpenHandles --forceExit"
-  }
-}
+export default new Factory();
 ```
