@@ -9,8 +9,13 @@ export class JsdomInitializer {
     constructor(private frontDistPath: string, private reconfigureSettings?:ReconfigureSettings) {
     }
 
+    public static loadFile(distPath: string, filePath: string): string {
+        return fs.readFileSync(path.join(distPath, filePath), 'utf8');
+    }
+
     run(): JSDOM.JSDOM {
-        const indexHTML = fs.readFileSync(path.join(this.frontDistPath, 'index.html'), 'utf8');
+        // const indexHTML = fs.readFileSync(path.join(this.frontDistPath, 'index.html'), 'utf8');
+        const indexHTML = JsdomInitializer.loadFile(this.frontDistPath, 'index.html');
         const jsdom = new JSDOM.JSDOM(indexHTML);
         if (this.reconfigureSettings){
             jsdom.reconfigure(this.reconfigureSettings);

@@ -25,6 +25,7 @@ export type FactoryAndParams = {
     }
     using: ConstructorType<any>[];
     domExcludes: ConstructorType<any>[];
+    ssrExcludeFilter?: (rr: RequestResponse) => boolean;
 }
 export class SSRFilter implements Filter {
     // private cache = new Map<string, {html: string, createTime: number}>();
@@ -78,6 +79,11 @@ export class SSRFilter implements Filter {
         // this.simpleBootFrontQueue.enqueue()
         const rr = new RequestResponse(req, res)
         if ((rr.reqHasAcceptHeader(Mimes.TextHtml) || rr.reqHasAcceptHeader(Mimes.All))) {
+            if (this.factory.ssrExcludeFilter?.(rr)) {
+                const html = JsdomInitializer.loadFile(this.factory.frontDistPath, 'index.html');
+                this.writeOkHtmlAndEnd({rr}, html);
+                return false;
+            }
             if (this.simpleBootFrontQueue.isEmpty()) {
                 await this.pushQueue();
             }
