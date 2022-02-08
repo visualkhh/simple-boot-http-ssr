@@ -10,9 +10,10 @@ export const LoadAroundBefore = (obj: any, propertyKey: string, args: any[]) => 
     if (simstanceManager && simOption && config?.scheme) {
         const key = config.scheme + '_' + propertyKey;
         const type = ReflectUtils.getReturnType(obj, propertyKey);
-        const data = simOption.window['server_side_data']?.[key]; //StorageUtils.cutLocalStorageJsonItem<any>(config.scheme + '_' + propertyKey, simOption.window);
-        delete simOption.window['server_side_data']?.[key];
-        if (data) {
+        const isHas = (key in (simOption.window['server_side_data']??{}))
+        if (isHas) {
+            const data = simOption.window['server_side_data']?.[key];
+            delete simOption.window['server_side_data']?.[key];
             let rdata = undefined;
             if (type === Promise) {
                 rdata = Promise.resolve(data);

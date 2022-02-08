@@ -46,6 +46,7 @@ export class SSRFilter implements Filter {
     //         // }
     //     }
     // }(this.simpleBootFrontPool, this.simpleBootFrontQueue);
+    private indexHTML: string;
     constructor(private factory: FactoryAndParams, public otherInstanceSim: Map<ConstructorType<any>, any>) {
         (async () => {
             for (let i = 0; i < this.factory.poolOption.min; i++) {
@@ -53,7 +54,8 @@ export class SSRFilter implements Filter {
             }
         })().then(it => {
             // console.log('SSRFilter init');
-        })
+        });
+        this.indexHTML = JsdomInitializer.loadFile(this.factory.frontDistPath, 'index.html');
     }
 
     async pushQueue() {
@@ -80,8 +82,7 @@ export class SSRFilter implements Filter {
         const rr = new RequestResponse(req, res)
         if ((rr.reqHasAcceptHeader(Mimes.TextHtml) || rr.reqHasAcceptHeader(Mimes.All))) {
             if (this.factory.ssrExcludeFilter?.(rr)) {
-                const html = JsdomInitializer.loadFile(this.factory.frontDistPath, 'index.html');
-                this.writeOkHtmlAndEnd({rr}, html);
+                this.writeOkHtmlAndEnd({rr}, this.indexHTML);
                 return false;
             }
             if (this.simpleBootFrontQueue.isEmpty()) {
