@@ -1,9 +1,7 @@
-import {IncomingMessage, ServerResponse} from 'http';
 import {RequestResponse} from 'simple-boot-http-server/models/RequestResponse';
 import {HttpHeaders} from 'simple-boot-http-server/codes/HttpHeaders';
 import {SimpleBootHttpSSRFactory} from '../SimpleBootHttpSSRFactory';
 import {ConstructorType} from 'simple-boot-core/types/Types';
-import {RandomUtils} from 'simple-boot-core/utils/random/RandomUtils';
 import {JsdomInitializer} from '../initializers/JsdomInitializer';
 import {Filter} from 'simple-boot-http-server/filters/Filter';
 import {Mimes} from 'simple-boot-http-server/codes/Mimes';
@@ -11,8 +9,6 @@ import {HttpStatus} from 'simple-boot-http-server/codes/HttpStatus';
 import {SimpleBootHttpServer} from 'simple-boot-http-server';
 import {SimFrontOption} from 'simple-boot-front/option/SimFrontOption';
 import {SimpleBootFront} from 'simple-boot-front/SimpleBootFront';
-import {Intent} from 'simple-boot-core/intent/Intent';
-import {SimAtomic} from 'simple-boot-core/simstance/SimAtomic';
 import {AsyncBlockingQueue} from 'simple-boot-core/queues/AsyncBlockingQueue';
 
 export type FactoryAndParams = {
@@ -73,13 +69,12 @@ export class SSRFilter implements Filter {
         }
     }
 
-    async before(req: IncomingMessage, res: ServerResponse, app: SimpleBootHttpServer) {
+    async before(rr: RequestResponse) {
         // const now = Date.now();
         // console.log('SSRFilter before start===================', this.simpleBootFrontQueue.isEmpty(), this.simpleBootFrontPool.length, now);
         // 무조건 promise로 await 해야 함
         // this.clearOneRequestStorage();
         // this.simpleBootFrontQueue.enqueue()
-        const rr = new RequestResponse(req, res)
         if ((rr.reqHasAcceptHeader(Mimes.TextHtml) || rr.reqHasAcceptHeader(Mimes.All))) {
             if (this.factory.ssrExcludeFilter?.(rr)) {
                 this.writeOkHtmlAndEnd({rr}, this.indexHTML);
@@ -185,7 +180,8 @@ export class SSRFilter implements Filter {
         rr.res.setHeader(HttpHeaders.ContentType, Mimes.TextHtml);
         rr.res.end(html);
     }
-    async after(req: IncomingMessage, res: ServerResponse, app: SimpleBootHttpServer, sw: boolean) {
+
+    async after(rr: RequestResponse, app: SimpleBootHttpServer, sw: boolean) {
         // console.log('----------', sw)
         return sw;
     }
