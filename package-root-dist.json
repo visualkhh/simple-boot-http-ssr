@@ -1,7 +1,7 @@
 {
   "name": "simple-boot-http-ssr",
   "version": "9.9.9",
-  "main": "SimpleBootHttpSsr.js",
+  "main": "SimpleBootHttpSSRServer.js",
   "license": "MIT",
   "description": "http server ssr frameworks",
   "keywords": [

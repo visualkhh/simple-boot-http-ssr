@@ -1,7 +1,7 @@
 {
   "name": "simple-boot-http-ssr",
-  "version": "1.0.3",
-  "main": "SimpleBootHttpSSR.js",
+  "version": "1.0.4",
+  "main": "SimpleBootHttpSSRServer.js",
   "license": "MIT",
   "description": "front end SPA frameworks SSR",
   "keywords": [

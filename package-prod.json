@@ -1,7 +1,7 @@
 {
   "name": "simple-boot-http-ssr",
-  "version": "1.0.3",
-  "main": "SimpleBootHttpSSR.js",
+  "version": "1.0.4",
+  "main": "SimpleBootHttpSSRServer.js",
   "license": "MIT",
   "description": "front end SPA frameworks SSR",
   "keywords": [
@@ -80,6 +80,7 @@
   },
   "dependencies": {
     "jsdom": "^18.1.1",
-    "simple-boot-http-server": "1.0.3"
+    "simple-boot-front": "1.0.100",
+    "simple-boot-http-server": "1.0.4"
   }
 }

@@ -5,7 +5,6 @@ import path from 'path';
 import {ReconfigureSettings} from 'jsdom';
 
 export class JsdomInitializer {
-
     constructor(private frontDistPath: string, private reconfigureSettings?:ReconfigureSettings) {
     }
 
@@ -17,7 +16,7 @@ export class JsdomInitializer {
         // const indexHTML = fs.readFileSync(path.join(this.frontDistPath, 'index.html'), 'utf8');
         const indexHTML = JsdomInitializer.loadFile(this.frontDistPath, 'index.html');
         const jsdom = new JSDOM.JSDOM(indexHTML);
-        if (this.reconfigureSettings){
+        if (this.reconfigureSettings) {
             jsdom.reconfigure(this.reconfigureSettings);
         }
         // global setting
