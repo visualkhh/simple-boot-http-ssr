@@ -1,5 +1,12 @@
 SIMPLE-BOOT-HTTP-SSR
 ===
+SSR web server
+* simple-boot-front + simple-boot-http-server
+
+### dependencies
+* simple-boot-front [![typescript](https://img.shields.io/badge/-npm-black?logo=npm)](https://www.npmjs.com/package/simple-boot-front)
+* simple-boot-http-server [![typescript](https://img.shields.io/badge/-npm-black?logo=npm)](https://www.npmjs.com/package/simple-boot-http-server)
+
 
 # frontend
 ```typescript
@@ -43,7 +50,6 @@ Promise.all([logger, transporter, new JsdomInitializer(environment.frontDistPath
     option.filters = [
         new ThrowFilter(new NotFoundError()),
         resourceFilter,
-        // 30minutes cache
         new SSRFilter({
             frontDistPath: environment.frontDistPath,
             factorySimFrontOption: (window: any) => MakeSimFrontOption(window),

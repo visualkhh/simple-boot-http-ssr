@@ -10,7 +10,6 @@ export class SimpleBootHttpSSRServer extends SimpleBootHttpServer {
     async run(otherInstanceSim?: Map<ConstructorType<any>, any>) {
         const oi = new Map<ConstructorType<any>, any>()
         otherInstanceSim?.forEach((value, key) => oi.set(key, value));
-        // oi.set(SimFrontOption, this.simFrontOption);
         return super.run(oi);
     }
 }

@@ -25,16 +25,4 @@ export const LoadAroundBefore = (obj: any, propertyKey: string, args: any[]) => 
         }
     }
     return args;
-    // if (simstanceManager && simOption && config?.scheme) {
-    //     if (beforeReturn instanceof Promise) {
-    //         beforeReturn.then((it) => {
-    //             console.log('SaveAroundAfter', obj, args, beforeReturn);
-    //             simOption.window.aroundStorage[config.scheme+'_'+propertyKey] = it;
-    //             return it;
-    //         });
-    //     } else {
-    //         simOption.window.aroundStorage[config.scheme+'_'+propertyKey] = beforeReturn;
-    //     }
-    // }
-    // return beforeReturn;
 }
