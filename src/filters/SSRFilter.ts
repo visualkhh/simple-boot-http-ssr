@@ -126,7 +126,7 @@ export class SSRFilter implements Filter {
                     }
                 }
 
-                this.writeOkHtmlAndEnd({rr}, html);
+                await this.writeOkHtmlAndEnd({rr}, html);
             } finally {
                 (simpleBootFront.option.window as any).ssrUse = false;
                 delete (simpleBootFront.option.window as any).server_side_data;
@@ -174,11 +174,11 @@ export class SSRFilter implements Filter {
         }
     }
 
-    writeOkHtmlAndEnd({rr, status = HttpStatus.Ok}: {rr: RequestResponse, status?: HttpStatus}, html: string) {
+    async writeOkHtmlAndEnd({rr, status = HttpStatus.Ok}: {rr: RequestResponse, status?: HttpStatus}, html: string) {
         // rr.res.writeHead(status, {[HttpHeaders.ContentType]: Mimes.TextHtml});
-        rr.res.statusCode = status;
-        rr.res.setHeader(HttpHeaders.ContentType, Mimes.TextHtml);
-        rr.res.end(html);
+        rr.resStatusCode(status);
+        rr.resSetHeader(HttpHeaders.ContentType, Mimes.TextHtml);
+        await rr.resEnd(html);
     }
 
     async after(rr: RequestResponse, app: SimpleBootHttpServer, sw: boolean) {
