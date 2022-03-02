@@ -43,7 +43,7 @@ export class SSRFilter implements Filter {
     //     }
     // }(this.simpleBootFrontPool, this.simpleBootFrontQueue);
     private indexHTML: string;
-    constructor(private factory: FactoryAndParams, public otherInstanceSim: Map<ConstructorType<any>, any>) {
+    constructor(private factory: FactoryAndParams, public otherInstanceSim?: Map<ConstructorType<any>, any>) {
         (async () => {
             for (let i = 0; i < this.factory.poolOption.min; i++) {
                 await this.pushQueue()
@@ -61,7 +61,7 @@ export class SSRFilter implements Filter {
             const window = jsdom.window as unknown as Window & typeof globalThis;
             (window as any).ssrUse = false;
             const option = this.factory.factorySimFrontOption(window);
-            option.name = `SSRFilter-pool-${idx+1}`
+            option.name = `SSRFilter-pool-${idx + 1}`
             const simpleBootFront = await this.factory.factory.create(option, this.factory.using, this.factory.domExcludes);
             simpleBootFront.run(this.otherInstanceSim);
             this.simpleBootFrontPool.push(simpleBootFront);
@@ -108,7 +108,7 @@ export class SSRFilter implements Filter {
                 (simpleBootFront.option.window as any).ssrUse = true;
                 delete (simpleBootFront.option.window as any).server_side_data;
 
-                //runRouting!!
+                // runRouting!!
                 const data = await simpleBootFront.goRouting(rr.reqUrl);
                 let html = simpleBootFront.option.window.document.documentElement.outerHTML;
 
@@ -121,7 +121,7 @@ export class SSRFilter implements Filter {
                             return `window.server_side_data.${k} = ${JSON.stringify(v)}`;
                         }
                     }).join(';');
-                    if(data) {
+                    if (data) {
                         html = html.replace('</head>', `<script> window.server_side_data={}; ${data}; </script></head>`);
                     }
                 }
@@ -132,43 +132,7 @@ export class SSRFilter implements Filter {
                 delete (simpleBootFront.option.window as any).server_side_data;
                 this.simpleBootFrontQueue.enqueue(simpleBootFront);
             }
-            // console.timeEnd(rootTimerLabel);
             return false;
-            // const jsDomTimerLabel = 'jsDomTimerLabel';
-            // const frontTimerLabel = 'frontTimerLabel';
-            // const frontRoutingTimerLabel = 'frontRoutingTimerLabel';
-            // console.time(jsDomTimerLabel);
-            // const jsdom = new JsdomInitializer(this.option.frontDistPath, {url: `http://localhost${rr.reqUrl}`}).run();
-            // console.timeEnd(jsDomTimerLabel);
-            //
-            // console.time(frontTimerLabel);
-            // const window = jsdom.window as unknown as Window & typeof globalThis;
-            // (window as any).uuid = RandomUtils.getRandomString(10);
-            // const option = this.makeSimFrontOption(window)
-            // const simpleBootFront = await this.factory.factory.create(option, this.factory.using, this.factory.domExcludes);
-            // console.timeEnd(frontTimerLabel);
-            //
-            // console.time(frontRoutingTimerLabel);
-            // const data = await simpleBootFront.runRouting(this.otherInstanceSim);
-            // //////////////
-            // const aroundStorage = (window as any).aroundStorage;
-            // let html = window.document.documentElement.outerHTML;
-            // this.cache.set(rr.reqUrl, {html, createTime: now});
-            //
-            // if (aroundStorage) {
-            //     const data = Object.entries(aroundStorage).map(([k, v]) => {
-            //         if (typeof v === 'string') {
-            //             return `window.localStorage.setItem('${k}', '${v}')`;
-            //         } else {
-            //             return `window.localStorage.setItem('${k}', '${JSON.stringify(v)}')`;
-            //         }
-            //     }).join(';');
-            //     if(data) {
-            //         html = html.replace('</body>', `<script>${data}</script></body>`);
-            //     }
-            // }
-            // console.timeEnd(frontRoutingTimerLabel);
-
         } else {
             return true;
         }

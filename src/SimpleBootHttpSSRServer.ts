@@ -7,9 +7,10 @@ export class SimpleBootHttpSSRServer extends SimpleBootHttpServer {
         super(rootRouter, option)
     }
 
-    async run(otherInstanceSim?: Map<ConstructorType<any>, any>) {
+    // @ts-ignore
+    run(otherInstanceSim?: Map<ConstructorType<any>, any>) {
         const oi = new Map<ConstructorType<any>, any>()
         otherInstanceSim?.forEach((value, key) => oi.set(key, value));
-        return super.run(oi);
+        super.run(oi);
     }
 }

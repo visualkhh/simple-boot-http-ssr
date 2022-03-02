@@ -38,6 +38,7 @@
     ]
   },
   "exclude": [
+    "libs",
     "examples",
     "simple-boot-front",
     "dom-render",

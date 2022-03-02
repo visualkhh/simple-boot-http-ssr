@@ -61,7 +61,12 @@
     "tsc:watch:dev": "rm -rf ./dist && mkdir dist && cp package-dev.json dist && tsc --watch --sourceMap true",
     "test": "jest --detectOpenHandles --forceExit"
   },
-  "alias": {},
+  "workspaces": [
+    "libs/dom-render/dist",
+    "libs/simple-boot-core/dist",
+    "libs/simple-boot-front/dist",
+    "libs/simple-boot-http-server/dist"
+  ],
   "devDependencies": {
     "@types/jest": "^26.0.22",
     "@types/jsdom": "^16.2.13",
@@ -79,12 +84,10 @@
     "typescript": "^4.4.3"
   },
   "dependencies": {
-    "dom-render": "file:../dist-dom-render",
-    "fast-json-patch": "^3.1.0",
     "jsdom": "^18.1.1",
-    "mime-types": "^2.1.34",
-    "simple-boot-http-server": "file:../dist-simple-boot-http-server",
-    "simple-boot-core": "file:../dist-simple-boot-core",
-    "simple-boot-front": "file:../dist-simple-boot-front"
+    "dom-render": "^1.0.70",
+    "simple-boot-core": "^1.0.29",
+    "simple-boot-front": "^1.0.101",
+    "simple-boot-http-server": "^1.0.6"
   }
 }

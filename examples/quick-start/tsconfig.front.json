@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+//    "typeRoots": ["./node_modules/@types", "./types", "jest"],
+//    "types" : ["node", "index", "rxjs"],
+    "outDir": "./dist-front"
+  },
+  "exclude": [
+    "test",
+    "server"
+  ]
+}
