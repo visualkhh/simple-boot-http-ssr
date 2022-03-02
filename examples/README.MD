@@ -17,8 +17,6 @@ cd libs/simple-boot-core
 git checkout master
 npm run npm-build
 
-#💥 cd root directory
-npm install
 
 cd libs/simple-boot-front
 git checkout master
@@ -26,6 +24,10 @@ npm run npm-build
 
 cd libs/simple-boot-http-server
 git checkout master
+npm run npm-build
+
+#💥 cd root directory
+npm install
 npm run npm-build
 ```
 

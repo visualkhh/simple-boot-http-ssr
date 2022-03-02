@@ -273,3 +273,5 @@ gradle-app.setting
 /dom-render/
 /simple-boot-front/
 /dom-render/
+/examples/quick-start/dist-front/
+/examples/quick-start/dist-server/

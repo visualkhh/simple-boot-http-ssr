@@ -8,6 +8,10 @@ SSR web server
 * simple-boot-http-server [![typescript](https://img.shields.io/badge/-npm-black?logo=npm)](https://www.npmjs.com/package/simple-boot-http-server)
 
 
+# 😃 examples
+- [examples](./examples)
+
+
 # frontend
 ```typescript
 const using = [
