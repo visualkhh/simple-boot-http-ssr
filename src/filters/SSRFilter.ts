@@ -12,6 +12,8 @@ import {SimpleBootFront} from 'simple-boot-front/SimpleBootFront';
 import {AsyncBlockingQueue} from 'simple-boot-core/queues/AsyncBlockingQueue';
 import {RandomUtils} from 'simple-boot-core/utils/random/RandomUtils';
 import * as JSDOM from 'jsdom';
+import {Worker, isMainThread, WorkerOptions, parentPort} from 'worker_threads';
+// const {Worker, isMainThread, WorkerOptions, parentPort} = require("worker_threads");
 
 export type FactoryAndParams = {
     frontDistPath: string;
@@ -31,7 +33,7 @@ export class SSRFilter implements Filter {
     private simpleBootFrontQueue = new AsyncBlockingQueue<SimpleBootFront>();
     private indexHTML: string;
     private welcomUrl = 'http://localhost'
-    constructor(private factory: FactoryAndParams, public otherInstanceSim?: Map<ConstructorType<any>, any>) {
+    constructor(public factory: FactoryAndParams, public otherInstanceSim?: Map<ConstructorType<any>, any>) {
         factory.frontDistIndexFileName = factory.frontDistIndexFileName || 'index.html';
         this.indexHTML = JsdomInitializer.loadFile(this.factory.frontDistPath, factory.frontDistIndexFileName);
     }
@@ -43,14 +45,24 @@ export class SSRFilter implements Filter {
         console.log('SimpleBootHttpSSRFactory init success ', + this.simpleBootFrontPool.size)
     }
 
+
+    workerTs(workerOptions: WorkerOptions) {
+        workerOptions.eval = true;
+        if (!workerOptions.workerData) {
+            workerOptions.workerData = {};
+        }
+        workerOptions.workerData.__filename = '/Users/hyunhakim/source/visualkhh/pet-space/libs/simple-boot-http-ssr/dist/filters/SSRCreatorWorker.js';
+        return new Worker(` const wk = require('worker_threads'); require('ts-node').register(); let file = wk.workerData.__filename; require(file); `, workerOptions,);
+    }
+
     async makeJsdom() {
         const jsdom = await new JsdomInitializer(this.factory.frontDistPath, this.factory.frontDistIndexFileName || 'index.html', {url: this.welcomUrl}).run();
         return jsdom;
     }
 
-    async makeFront() {
+    async makeFront(jsdom: JSDOM.JSDOM) {
         const name = RandomUtils.uuid();
-        const jsdom = await this.makeJsdom();
+        // const jsdom = await this.makeJsdom();
         const window = jsdom.window as unknown as Window & typeof globalThis;
         (window as any).ssrUse = false;
         const option = this.factory.factorySimFrontOption(window);
@@ -71,7 +83,7 @@ export class SSRFilter implements Filter {
             this.simpleBootFrontPool.delete(destorFront.option.name!);
         }
         if (this.simpleBootFrontPool.size < this.factory.poolOption.max) {
-            this.enqueueFrontApp(await this.makeFront());
+            this.enqueueFrontApp(await this.makeFront(await this.makeJsdom()));
         }
     }
 
@@ -89,7 +101,7 @@ export class SSRFilter implements Filter {
             }
             const simpleBootFront = await this.simpleBootFrontQueue.dequeue();
             try {
-                console.log('SSRFilter before-->' , simpleBootFront.option.name, 'poolLength:',this.simpleBootFrontPool.size);
+                // console.log('SSRFilter before-->' , simpleBootFront.option.name, 'poolLength:',this.simpleBootFrontPool.size);
                 (simpleBootFront.option.window as any).ssrUse = true;
                 delete (simpleBootFront.option.window as any).server_side_data;
 
@@ -110,13 +122,15 @@ export class SSRFilter implements Filter {
                         html = html.replace('</head>', `<script> window.server_side_data={}; ${data}; </script></head>`);
                     }
                 }
-                console.log('writteeeeee', rr.resIsDone())
+                // console.log('writteeeeee', rr.resIsDone())
                 await this.writeOkHtmlAndEnd({rr}, html);
-                console.log('writteeeeeeeddd done', rr.resIsDone())
+                // console.log('writteeeeeeeddd done', rr.resIsDone())
             } finally {
                 (simpleBootFront.option.window as any).ssrUse = false;
                 delete (simpleBootFront.option.window as any).server_side_data;
-                // ((simpleBootFront as any).jsdom as JSDOM.JSDOM)?.reconfigure({url: this.welcomUrl });
+                // ((simpleBootFront as any).jsdom as JSDOM.JSDOM)?.reconfigure({url: '/' });
+                // simpleBootFront.option.window.location.href = 'about:blank';
+                // this.simpleBootFrontQueue.enqueue(simpleBootFront);
                 // simpleBootFront.option.window.document.body.innerHTML = this.rootJSDOM.window.document.body.innerHTML;
                 // simpleBootFront.writeRootRouter()
                 // await simpleBootFront.goRouting('/');
@@ -126,10 +140,57 @@ export class SSRFilter implements Filter {
                 // simpleBootFront.option.window.location.href = this.welcomUrl;
                 // simpleBootFront.option.window.document.documentElement.outerHTML = this.indexHTML;
                 // this.simpleBootFrontQueue.enqueue(simpleBootFront);
-                await new Promise((re, r) => setTimeout(() => re(true), 10000));
-                this.pushQueue(simpleBootFront).then(it => {
-                    console.log('deee')
+                // await new Promise((re, r) => setTimeout(() => re(true), 10000));
+                // new Promise((re, r) => setTimeout(() => re(true), 10000)).then(it => {
+                //     console.log('ddddddddddd')
+                // });
+                this.simpleBootFrontPool.delete(simpleBootFront.option.name!);
+                // if (isMainThread) { // 메인 스레드
+                //     console.log('file-->', __filename)
+                //     const worker = new Worker(__filename);
+                //     worker.on('message', (value: any) => {
+                //         console.log('워커로부터', value)
+                //     })
+                //     worker.on('exit', (value: any) => { // parentPort.close()가 일어나면 이벤트 발생
+                //         console.log('워커 끝~');
+                //     })
+                //     worker.postMessage('ping'); // 워커스레드에게 메세지를 보낸다.
+                // } else { // 워커스레드
+                //     parentPort.on('message', (value: any) => {
+                //         console.log("부모로부터", value);
+                //         parentPort.postMessage('pong');
+                //         parentPort.close(); // 워커스레드 종료라고 메인스레드에 알려줘야 exit이벤트 발생
+                //     })
+                // }
+
+                const receiveWorker = new Worker('/Users/hyunhakim/source/visualkhh/pet-space/libs/simple-boot-http-ssr/dist/filters/SSRCreatorWorker.js');
+                receiveWorker.on('message', (msg: JSDOM.JSDOM)=>{
+                    console.log('워커로부터', msg, msg.window.document.body.innerHTML)
+                    console.log('a message is sent! : ', msg)
+
                 });
+
+                receiveWorker.on('error', err=>{
+                    console.error(err);
+                })
+
+                receiveWorker.on('exit', ()=>console.log('exited!'));
+                receiveWorker.postMessage(
+                    {
+                        frontDistPath: this.factory.frontDistPath,
+                        frontDistIndexFileName: this.factory.frontDistIndexFileName,
+                    }
+                );
+
+                // const myWorkers = this.workerTs({});
+                // myWorkers.postMessage(this);
+                // myWorkers.on('message', (value: SimpleBootFront) => {
+                //     this.pushQueue(value);
+                // })
+                // this
+                // this.pushQueue(simpleBootFront).then(it => {
+                //     console.log('deee')
+                // });
                 // console.log('-1->', simpleBootFront.option.window.location.href);
                 // simpleBootFront.option.window.location.href = this.welcomUrl;
                 // simpleBootFront.option.window.location.reload();

@@ -56,7 +56,7 @@
     "tsc": "tsc",
     "tsc:watch": "rm -rf ./dist && mkdir dist && cp package.json dist && tsc --watch --sourceMap true",
     "tsc:watch:dev": "rm -rf ./dist && mkdir dist && cp package-dev.json dist && tsc --watch --sourceMap true",
-    "tsc:watch:prod": "rm -rf dist && mkdir dist && cp package-prod.json dist/package.json && cp README.MD dist && tsc --watch --outDir dist --declarationDir dist",
+    "tsc:watch:prod": "rm -rf dist && mkdir dist && cp package-prod.json dist/package.json && cp README.MD dist && tsc --watch  --sourceMap true --outDir dist --declarationDir dist",
     "test": "jest --detectOpenHandles --forceExit"
   },
   "workspaces": [
