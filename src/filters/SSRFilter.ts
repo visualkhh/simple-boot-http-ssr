@@ -13,6 +13,7 @@ import {AsyncBlockingQueue} from 'simple-boot-core/queues/AsyncBlockingQueue';
 
 export type FactoryAndParams = {
     frontDistPath: string;
+    frontDistIndexFileName?: string;
     factorySimFrontOption: (window: any) => SimFrontOption;
     factory: SimpleBootHttpSSRFactory;
     poolOption: {
@@ -24,40 +25,25 @@ export type FactoryAndParams = {
     ssrExcludeFilter?: (rr: RequestResponse) => boolean;
 }
 export class SSRFilter implements Filter {
-    // private cache = new Map<string, {html: string, createTime: number}>();
-    // notFoundHtml?: string;
-    // public oneRequestStorage: {[key: string]: any} = {};
-    // constructor(private simpleBootFront: SimpleBootFront) {
-    // private rootSimpleBootFront?: SimpleBootFront;
     private simpleBootFrontPool: SimpleBootFront[] = [];
-    // private simpleBootFrontQueue: Promise<SimpleBootFront>[] = [];
     private simpleBootFrontQueue = new AsyncBlockingQueue<SimpleBootFront>();
-    // private detectPool: Generator<null, void, SimpleBootFront> = function* (pool: SimpleBootFront[], queue: AsyncBlockingQueue<SimpleBootFront>) {
-    //     while (true) {
-    //         const data = yield null;
-    //         // if (this.simpleBootFrontPool.length > 0) {
-    //         //     yield this.simpleBootFrontPool.shift();
-    //         // } else {
-    //         //     yield new SimpleBootFront();
-    //         // }
-    //     }
-    // }(this.simpleBootFrontPool, this.simpleBootFrontQueue);
     private indexHTML: string;
+    private welcomUrl = 'http://localhost'
     constructor(private factory: FactoryAndParams, public otherInstanceSim?: Map<ConstructorType<any>, any>) {
-        (async () => {
-            for (let i = 0; i < this.factory.poolOption.min; i++) {
-                await this.pushQueue()
-            }
-        })().then(it => {
-            // console.log('SSRFilter init');
-        });
-        this.indexHTML = JsdomInitializer.loadFile(this.factory.frontDistPath, 'index.html');
+        factory.frontDistIndexFileName = factory.frontDistIndexFileName || 'index.html';
+        this.indexHTML = JsdomInitializer.loadFile(this.factory.frontDistPath, factory.frontDistIndexFileName);
+    }
+
+    async onInit(app: SimpleBootHttpServer) {
+        for (let i = 0; i < this.factory.poolOption.min; i++) {
+            await this.pushQueue()
+        }
     }
 
     async pushQueue() {
         if (this.simpleBootFrontPool.length < this.factory.poolOption.max) {
             const idx = this.simpleBootFrontPool.length
-            const jsdom = new JsdomInitializer(this.factory.frontDistPath, {url: `http://localhost`}).run();
+            const jsdom = await new JsdomInitializer(this.factory.frontDistPath, this.factory.frontDistIndexFileName || 'index.html', {url: this.welcomUrl}).run();
             const window = jsdom.window as unknown as Window & typeof globalThis;
             (window as any).ssrUse = false;
             const option = this.factory.factorySimFrontOption(window);
@@ -73,8 +59,6 @@ export class SSRFilter implements Filter {
         // const now = Date.now();
         // console.log('SSRFilter before start===================', this.simpleBootFrontQueue.isEmpty(), this.simpleBootFrontPool.length, now);
         // 무조건 promise로 await 해야 함
-        // this.clearOneRequestStorage();
-        // this.simpleBootFrontQueue.enqueue()
         if ((rr.reqHasAcceptHeader(Mimes.TextHtml) || rr.reqHasAcceptHeader(Mimes.All))) {
             if (this.factory.ssrExcludeFilter?.(rr)) {
                 this.writeOkHtmlAndEnd({rr}, this.indexHTML);
@@ -84,32 +68,13 @@ export class SSRFilter implements Filter {
                 await this.pushQueue();
             }
             const simpleBootFront = await this.simpleBootFrontQueue.dequeue();
-            // notfound catched!!
-            // const route = await this.rootSimpleBootFront.routing<SimAtomic, any>(new Intent(rr.reqUrl));
-            // if(!route.module && this.notFoundHtml){
-            //     this.writeOkHtmlAndEnd({rr, status: HttpStatus.NotFound}, this.notFoundHtml);
-            //     return false;
-            // }
-            //
-            // // cache
-            // if (this.option.cacheMiliSecond && this.cache.has(rr.reqUrl)) {
-            //     const data = this.cache.get(rr.reqUrl)!;
-            //     if ((now - data.createTime) < this.option.cacheMiliSecond) {
-            //         this.writeOkHtmlAndEnd({rr}, data.html);
-            //         return false;
-            //     }
-            // }
-
-            // const rootTimerLabel = 'rootTimerLabel';
-            // console.time(rootTimerLabel);
-            // const data = await this.rootSimpleBootFront.runRouting(this.otherInstanceSim, rr.reqUrl);
             try {
                 // console.log('SSRFilter before-->' , simpleBootFront.option.name, 'poolLength:',this.simpleBootFrontPool.length);
                 (simpleBootFront.option.window as any).ssrUse = true;
                 delete (simpleBootFront.option.window as any).server_side_data;
 
                 // runRouting!!
-                const data = await simpleBootFront.goRouting(rr.reqUrl);
+                await simpleBootFront.goRouting(rr.reqUrl);
                 let html = simpleBootFront.option.window.document.documentElement.outerHTML;
 
                 const serverSideData = (simpleBootFront.option.window as any).server_side_data;
@@ -130,6 +95,7 @@ export class SSRFilter implements Filter {
             } finally {
                 (simpleBootFront.option.window as any).ssrUse = false;
                 delete (simpleBootFront.option.window as any).server_side_data;
+                simpleBootFront.option.window.location.href = this.welcomUrl;
                 this.simpleBootFrontQueue.enqueue(simpleBootFront);
             }
             return false;

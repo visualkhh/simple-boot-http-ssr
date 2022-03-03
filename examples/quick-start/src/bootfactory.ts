@@ -8,13 +8,10 @@ export const MakeSimFrontOption = (window: any) : SimFrontOption => {
 }
 
 class Factory extends SimpleBootHttpSSRFactory {
-    factory(simFrontOption: SimFrontOption, using: ConstructorType<any>[] = [], domExcludes: ConstructorType<any>[] = []): Promise<SimpleBootFront> {
-        // console.log('create simplefront--->', (simFrontOption.window as any).uuid, simFrontOption.window.location.href);
-        // const simFrontOption = new SimFrontOption(window).setUrlType(UrlType.path);
+    async factory(simFrontOption: SimFrontOption, using: ConstructorType<any>[] = [], domExcludes: ConstructorType<any>[] = []): Promise<SimpleBootFront> {
         const simpleBootFront = new SimpleBootFront(AppRouter, simFrontOption);
-        // const simpleBootFront = new SimpleBootFront(TestRouterComponent, simFrontOption);
         simpleBootFront.domRendoerExcludeProxy.push(...domExcludes);
-        return Promise.resolve(simpleBootFront);
+        return simpleBootFront;
     }
 }
 export default new Factory();

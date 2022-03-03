@@ -5,17 +5,18 @@ import path from 'path';
 import {ReconfigureSettings} from 'jsdom';
 
 export class JsdomInitializer {
-    constructor(private frontDistPath: string, private reconfigureSettings?:ReconfigureSettings) {
+    constructor(private frontDistPath: string, private frontDistIndexFileName: string, private reconfigureSettings?:ReconfigureSettings) {
     }
 
     public static loadFile(distPath: string, filePath: string): string {
         return fs.readFileSync(path.join(distPath, filePath), 'utf8');
     }
 
-    run(): JSDOM.JSDOM {
+    async run(): Promise<JSDOM.JSDOM> {
         // const indexHTML = fs.readFileSync(path.join(this.frontDistPath, 'index.html'), 'utf8');
-        const indexHTML = JsdomInitializer.loadFile(this.frontDistPath, 'index.html');
-        const jsdom = new JSDOM.JSDOM(indexHTML);
+        // const indexHTML = JsdomInitializer.loadFile(this.frontDistPath, this.frontDistIndexFileName);
+        const pathStr = path.join(this.frontDistPath, this.frontDistIndexFileName);
+        const jsdom = await JSDOM.JSDOM.fromFile(pathStr);
         if (this.reconfigureSettings) {
             jsdom.reconfigure(this.reconfigureSettings);
         }
