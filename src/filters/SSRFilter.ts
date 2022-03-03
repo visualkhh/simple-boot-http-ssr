@@ -89,7 +89,7 @@ export class SSRFilter implements Filter {
             }
             const simpleBootFront = await this.simpleBootFrontQueue.dequeue();
             try {
-                // console.log('SSRFilter before-->' , simpleBootFront.option.name, 'poolLength:',this.simpleBootFrontPool.length);
+                console.log('SSRFilter before-->' , simpleBootFront.option.name, 'poolLength:',this.simpleBootFrontPool.size);
                 (simpleBootFront.option.window as any).ssrUse = true;
                 delete (simpleBootFront.option.window as any).server_side_data;
 
@@ -110,7 +110,6 @@ export class SSRFilter implements Filter {
                         html = html.replace('</head>', `<script> window.server_side_data={}; ${data}; </script></head>`);
                     }
                 }
-
                 await this.writeOkHtmlAndEnd({rr}, html);
             } finally {
                 (simpleBootFront.option.window as any).ssrUse = false;
@@ -125,8 +124,9 @@ export class SSRFilter implements Filter {
                 // simpleBootFront.option.window.location.href = this.welcomUrl;
                 // simpleBootFront.option.window.document.documentElement.outerHTML = this.indexHTML;
                 // this.simpleBootFrontQueue.enqueue(simpleBootFront);
+                await new Promise((re, r) => setTimeout(() => re(true), 10000));
                 this.pushQueue(simpleBootFront).then(it => {
-                    // console.log('deee')
+                    console.log('deee')
                 });
                 // console.log('-1->', simpleBootFront.option.window.location.href);
                 // simpleBootFront.option.window.location.href = this.welcomUrl;
