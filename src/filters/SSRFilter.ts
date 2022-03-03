@@ -110,7 +110,9 @@ export class SSRFilter implements Filter {
                         html = html.replace('</head>', `<script> window.server_side_data={}; ${data}; </script></head>`);
                     }
                 }
+                console.log('writteeeeee', rr.resIsDone())
                 await this.writeOkHtmlAndEnd({rr}, html);
+                console.log('writteeeeeeeddd done', rr.resIsDone())
             } finally {
                 (simpleBootFront.option.window as any).ssrUse = false;
                 delete (simpleBootFront.option.window as any).server_side_data;
