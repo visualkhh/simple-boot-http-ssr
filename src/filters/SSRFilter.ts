@@ -130,7 +130,7 @@ export class SSRFilter implements Filter {
             } finally {
                 (simpleBootFront.option.window as any).ssrUse = false;
                 delete (simpleBootFront.option.window as any).server_side_data;
-                simpleBootFront.initWriteRootRouter();
+                // simpleBootFront.ninitWriteRootRouter();
                 // ((simpleBootFront as any).jsdom as JSDOM.JSDOM)?.reconfigure({url: '/' });
                 // simpleBootFront.option.window.location.href = 'about:blank';
                 this.simpleBootFrontQueue.enqueue(simpleBootFront);
