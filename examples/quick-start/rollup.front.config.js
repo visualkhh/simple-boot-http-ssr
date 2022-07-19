@@ -2,7 +2,7 @@ import json from '@rollup/plugin-json'
 import copy from 'rollup-plugin-copy'
 import replace from '@rollup/plugin-replace'
 import resolve from 'rollup-plugin-node-resolve'
-import commonjs from 'rollup-plugin-commonjs'
+import commonjs from '@rollup/plugin-commonjs';
 import html from 'rollup-plugin-html'
 import css from 'rollup-plugin-import-css'
 import typescript from '@rollup/plugin-typescript'
