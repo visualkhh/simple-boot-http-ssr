@@ -1,6 +1,6 @@
 {
   "name": "simple-boot-http-ssr",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "main": "SimpleBootHttpSSRServer.js",
   "license": "MIT",
   "description": "front end SPA frameworks SSR",
@@ -21,14 +21,14 @@
     "Hoil-Gang (https://github.com/khl1154)",
     "hwangsero (https://github.com/hwangsero)"
   ],
-  "homepage": "https://github.com/visualkhh/simple-boot-front",
+  "homepage": "https://github.com/visualkhh/simple-boot-http-ssr",
   "bugs": {
-    "url": "https://github.com/visualkhh/simple-boot-front",
+    "url": "https://github.com/visualkhh/simple-boot-http-ssr",
     "email": "visualkhh@gmail.com"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/visualkhh/simple-boot-front"
+    "url": "https://github.com/visualkhh/simple-boot-http-ssr"
   },
   "jest": {
     "transform": {
