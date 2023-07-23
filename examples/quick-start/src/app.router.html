@@ -2,6 +2,6 @@
     <button router-link="/">main</button> | <button router-link="/sub">sub</button>
 </header>
 <main>
-    <route component="this.child"></route>
+    <route dr-this="this.child" dr-this:type="outlet" dr-strip="false"></route>
 </main>
 <footer>footer</footer>
