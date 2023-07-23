@@ -109,6 +109,7 @@ export class SSRFilter implements Filter {
 
                 // runRouting!!
                 await simpleBootFront.goRouting(rr.reqUrl);
+                await new Promise((r)=> setTimeout(r, 0)); // <-- 이거 넣어야지 두번불러지는게 없어지는듯? 뭐지 event loop 변경된건가?
                 let html = simpleBootFront.option.window.document.documentElement.outerHTML;
 
                 const serverSideData = (simpleBootFront.option.window as any).server_side_data;
