@@ -112,6 +112,7 @@ export class SSRFilter implements Filter {
                 await new Promise((r)=> setTimeout(r, 0)); // <-- 이거 넣어야지 두번불러지는게 없어지는듯? 뭐지 event loop 변경된건가?
                 let html = simpleBootFront.option.window.document.documentElement.outerHTML;
 
+
                 const serverSideData = (simpleBootFront.option.window as any).server_side_data;
                 if (serverSideData) {
                     const data = Object.entries(serverSideData).map(([k, v]) => {
@@ -126,8 +127,15 @@ export class SSRFilter implements Filter {
                     }
                 }
                 // console.log('writteeeeee', rr.resIsDone())
-                await this.writeOkHtmlAndEnd({rr}, html);
                 // console.log('writteeeeeeeddd done', rr.resIsDone())
+                // console.log('-----wewewe', simpleBootFront.option.window.document.styleSheets, html)
+                // Array.from(simpleBootFront.option.window.document.styleSheets)?.filter(it => it.ownerNode instanceof Element && it.ownerNode.hasAttribute('domstyle')).forEach(it => {
+                //     const styleElement = (it.ownerNode as Element);
+                //     const cssTexts = Array.from(it.rules)?.map(it => it.cssText) ?? [];
+                //     console.log('----!!!!!-----', cssTexts);
+                //     styleElement.innerHTML = cssTexts.join('\n');
+                // })
+                await this.writeOkHtmlAndEnd({rr}, html);
             } finally {
                 (simpleBootFront.option.window as any).ssrUse = false;
                 delete (simpleBootFront.option.window as any).server_side_data;

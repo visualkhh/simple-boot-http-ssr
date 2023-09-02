@@ -64,7 +64,7 @@
   "alias": {},
   "devDependencies": {
     "@types/jest": "^26.0.22",
-    "@types/jsdom": "^16.2.13",
+    "@types/jsdom": "^21.1.2",
     "@types/mime-types": "^2.1.1",
     "@typescript-eslint/eslint-plugin": "^4.16.1",
     "@typescript-eslint/parser": "^4.16.1",
@@ -79,7 +79,9 @@
     "typescript": "^4.4.3"
   },
   "dependencies": {
-    "jsdom": "^18.1.1",
+    "dom-render": "^1.0.87",
+    "jsdom": "^22.1.0",
+    "simple-boot-core": "^1.0.32",
     "simple-boot-front": "^1.0.109",
     "simple-boot-http-server": "^1.0.8"
   }
