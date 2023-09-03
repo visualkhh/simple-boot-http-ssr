@@ -12,6 +12,7 @@ import {SimpleBootFront} from 'simple-boot-front/SimpleBootFront';
 import {AsyncBlockingQueue} from 'simple-boot-core/queues/AsyncBlockingQueue';
 import {RandomUtils} from 'simple-boot-core/utils/random/RandomUtils';
 import path from 'path';
+import css from 'css'
 import * as JSDOM from 'jsdom';
 import {Worker, isMainThread, WorkerOptions, parentPort} from 'worker_threads';
 
@@ -110,6 +111,39 @@ export class SSRFilter implements Filter {
                 // runRouting!!
                 await simpleBootFront.goRouting(rr.reqUrl);
                 await new Promise((r)=> setTimeout(r, 0)); // <-- 이거 넣어야지 두번불러지는게 없어지는듯? 뭐지 event loop 변경된건가?
+
+
+
+
+                simpleBootFront.option.window.document.querySelectorAll('style[domstyle][id]')?.forEach(it => {
+                    const id = (it.getAttribute('id')??'').split('-')[0]
+                    const start = `#${id}-start`;
+                    const end = `#${id}-end`;
+                    // const originCss = it.innerHTML.replace(/\/\*.*?\*\//g, '');
+                    // const cssobject = css.parse(originCss)
+                    const cssobject = css.parse(it.innerHTML)
+                    // const cssobject = css.parse(`h1 { color: red }`);
+                    cssobject.stylesheet?.rules.forEach(it => {
+                        if (it.type ==='rule') {
+                            const rule = (it as css.Rule);
+                            rule.selectors = rule.selectors?.map(sit => {
+                                const selectorText = `:is(${start} ~ *:not(${start} ~ ${end} ~ *))`;
+                                if (sit.startsWith('.')) {
+                                    return `${selectorText}${sit}, ${selectorText} ${sit}`;
+                                } else {
+                                    const divText = `${start} ~ ${sit}:not(${start} ~ ${end} ~ *)`;
+                                    return `${selectorText} ${sit}, ${divText}`;
+                                }
+                            });
+                        }
+                    })
+                    const style = simpleBootFront.option.window.document.createElement('style')
+                    style.innerHTML =  css.stringify(cssobject);
+                    it.replaceWith(style);
+                })
+
+
+
                 let html = simpleBootFront.option.window.document.documentElement.outerHTML;
 
 
@@ -126,6 +160,8 @@ export class SSRFilter implements Filter {
                         html = html.replace('</head>', `<script> window.server_side_data={}; ${data}; </script></head>`);
                     }
                 }
+
+
                 // console.log('writteeeeee', rr.resIsDone())
                 // console.log('writteeeeeeeddd done', rr.resIsDone())
                 // console.log('-----wewewe', simpleBootFront.option.window.document.styleSheets, html)
