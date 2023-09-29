@@ -125,11 +125,11 @@ export class SSRFilter implements Filter {
                         html = html.replace('</head>', `<script> window.server_side_data={}; ${data}; </script></head>`);
                     }
                 }
-
                 await this.writeOkHtmlAndEnd({rr}, html);
             } finally {
                 (simpleBootFront.option.window as any).ssrUse = false;
                 delete (simpleBootFront.option.window as any).server_side_data;
+                // console.log('--------->', simpleBootFront.option.window)
                 // simpleBootFront.ninitWriteRootRouter();
                 // ((simpleBootFront as any).jsdom as JSDOM.JSDOM)?.reconfigure({url: '/' });
                 // simpleBootFront.option.window.location.href = 'about:blank';
