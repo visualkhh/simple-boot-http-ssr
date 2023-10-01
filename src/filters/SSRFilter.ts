@@ -91,14 +91,10 @@ export class SSRFilter implements Filter {
     }
 
     async before(rr: RequestResponse) {
-        const now = Date.now();
-        // console.log('SSRFilter before start===================',rr.reqUrl, this.simpleBootFrontQueue.isEmpty(), this.simpleBootFrontPool.size, now);
-        // 무조건 promise로 await 해야 함
+        if (this.factory.ssrExcludeFilter?.(rr)) {
+            return false;
+        }
         if ((rr.reqHasAcceptHeader(Mimes.TextHtml) || rr.reqHasAcceptHeader(Mimes.All))) {
-            if (this.factory.ssrExcludeFilter?.(rr)) {
-                await this.writeOkHtmlAndEnd({rr}, this.indexHTML);
-                return false;
-            }
             if (this.simpleBootFrontQueue.isEmpty()) {
                 await this.pushQueue();
             }
