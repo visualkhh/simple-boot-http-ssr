@@ -8,7 +8,6 @@ import { ConvertUtils } from 'simple-boot-core/utils/convert/ConvertUtils';
 export class IntentSchemeFrontProxy implements ProxyHandler<any> {
   public get(target: any, prop: string): any {
     const t = target[prop];
-    console.log('----->tttt', prop);
     // TODO: 여기에 추가적인 프로퍼티 작성으 추가적으로 해야된다..
     // if (typeof t === 'function') {
     if (!['constructor', 'onProxyDomRender', 'toString'].includes(prop)) {
