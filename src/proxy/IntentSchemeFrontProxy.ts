@@ -1,6 +1,7 @@
 import { getSim, Sim } from 'simple-boot-core/decorators/SimDecorator';
 import { HttpHeaders } from 'simple-boot-http-server/codes/HttpHeaders';
-import { IntentSchemeFilterHttpHeaders, IntentSchemeFilterMimes } from '../filters/IntentSchemeFilter';
+import { HttpHeaders as SSRHttpHeaders } from '../codes/HttpHeaders';
+import { Mimes as SSRMimes } from '../codes/Mimes';
 import { ReflectUtils } from 'simple-boot-core/utils/reflect/ReflectUtils';
 import { ConvertUtils } from 'simple-boot-core/utils/convert/ConvertUtils';
 
@@ -34,7 +35,7 @@ export class IntentSchemeFrontProxy implements ProxyHandler<any> {
          return fetch(`/${prop.toString()}`,
             {
               method: 'POST',
-              headers: {[HttpHeaders.ContentType]: IntentSchemeFilterMimes.ApplicationJson, [IntentSchemeFilterHttpHeaders.XSimpleBootSsrIntentScheme]: firstScheme ?? ''},
+              headers: {[HttpHeaders.ContentType]: SSRMimes.ApplicationJsonPostSimpleBootSsrIntentScheme, [SSRHttpHeaders.XSimpleBootSsrIntentScheme]: firstScheme ?? ''},
               body: JSON.stringify(args[0])
             }
           ).then(async (res) => {
