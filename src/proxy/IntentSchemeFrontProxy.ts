@@ -43,7 +43,11 @@ export class IntentSchemeFrontProxy implements ProxyHandler<any> {
              const data = await res.json();
              return data;
            } catch(e) {
-             return undefined;
+             try {
+               return await res.text();
+             } catch(e) {
+               return undefined;
+             }
            }
           });
         }

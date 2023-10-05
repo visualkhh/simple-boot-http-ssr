@@ -86,7 +86,7 @@ export class SSRWorker {
         const window = jsdom.window as unknown as Window & typeof globalThis;
         (window as any).ssrUse = false;
         const option = this.factory.factorySimFrontOption(window);
-        option.name = name;
+        // option.name = name;
         const simpleBootFront = await this.factory.factory.create(option, this.factory.using, this.factory.domExcludes);
         simpleBootFront.run(this.otherInstanceSim);
         (simpleBootFront as any).jsdom = jsdom;
