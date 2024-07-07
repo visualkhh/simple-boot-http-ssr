@@ -8,7 +8,7 @@ export const MakeSimFrontOption = (window: any) : SimFrontOption => {
 }
 
 class Factory extends SimpleBootHttpSSRFactory {
-    async factory(simFrontOption: SimFrontOption, using: ConstructorType<any>[] = [], domExcludes: ConstructorType<any>[] = []): Promise<SimpleBootFront> {
+    async factory(simFrontOption: SimFrontOption, using: (ConstructorType<any> | Function)[] = [], domExcludes: ConstructorType<any>[] = []): Promise<SimpleBootFront> {
         const simpleBootFront = new SimpleBootFront(AppRouter, simFrontOption);
         simpleBootFront.domRendoerExcludeProxy.push(...domExcludes);
         return simpleBootFront;

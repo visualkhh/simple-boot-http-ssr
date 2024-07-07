@@ -11,10 +11,7 @@ import {SimFrontOption} from 'simple-boot-front/option/SimFrontOption';
 import {SimpleBootFront} from 'simple-boot-front/SimpleBootFront';
 import {AsyncBlockingQueue} from 'simple-boot-core/queues/AsyncBlockingQueue';
 import {RandomUtils} from 'simple-boot-core/utils/random/RandomUtils';
-import path from 'path';
-import css from 'css'
 import * as JSDOM from 'jsdom';
-import {Worker, isMainThread, WorkerOptions, parentPort} from 'worker_threads';
 
 export type FactoryAndParams = {
     frontDistPath: string;

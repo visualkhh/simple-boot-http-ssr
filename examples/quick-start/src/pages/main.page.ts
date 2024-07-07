@@ -3,7 +3,7 @@ import {Component} from 'simple-boot-front/decorators/Component';
 import {Inject} from 'simple-boot-core/decorators/inject/Inject';
 import {UserService} from '@src/services/UserService';
 
-@Sim()
+@Sim
 @Component({
     template: '<h1>MainPage</h1>'
 })
