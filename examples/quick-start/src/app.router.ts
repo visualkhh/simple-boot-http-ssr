@@ -6,7 +6,7 @@ import {MainPage} from '@src/pages/main.page';
 import {SubPage} from '@src/pages/sub.page';
 import {RouterAction} from 'simple-boot-core/route/RouterAction';
 import {Intent} from 'simple-boot-core/intent/Intent';
-@Sim()
+@Sim
 @Router({
     path: '',
     route: {

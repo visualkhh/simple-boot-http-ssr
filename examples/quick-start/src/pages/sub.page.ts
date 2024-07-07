@@ -3,13 +3,13 @@ import {Component} from 'simple-boot-front/decorators/Component';
 import {Inject} from 'simple-boot-core/decorators/inject/Inject';
 import {UserService} from '@src/services/UserService';
 
-@Sim()
+@Sim
 @Component({
     template: '<h1>SubPage</h1>'
 })
 export class SubPage {
     constructor(@Inject({scheme: UserService.scheme}) private userService: UserService.UserService) {
-        console.log('main constructor');
+        console.log('sub constructor');
         this.userService.say('sub');
     }
 }
